@@ -1,0 +1,79 @@
+group 'com.hodoan.ble_sdk'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.7.10'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.2.0'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.17'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.google.protobuf'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 33
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        main {
+            proto {
+                srcDir '../protos/'
+            }
+        }
+    }
+
+    defaultConfig {
+        minSdkVersion 23
+        targetSdkVersion 33
+        consumerProguardFiles 'proguard-rules.txt'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.18.1'
+    }
+
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option "lite"
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.google.protobuf:protobuf-javalite:3.18.1'
+}

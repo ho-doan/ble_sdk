@@ -1,0 +1,22 @@
+PODS:
+  - ble_sdk (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - ble_sdk (from `.symlinks/plugins/ble_sdk/ios`)
+  - Flutter (from `Flutter`)
+
+EXTERNAL SOURCES:
+  ble_sdk:
+    :path: ".symlinks/plugins/ble_sdk/ios"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  ble_sdk: 5edb6e0283997030b90e134a8f838785b86e7d55
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+
+PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
+
+COCOAPODS: 1.11.3
