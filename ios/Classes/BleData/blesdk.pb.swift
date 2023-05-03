@@ -136,12 +136,63 @@ struct BluetoothBLEModel {
   init() {}
 }
 
-struct ServicesDiscovered {
+struct Log {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var data: [String] = []
+  var message: String = String()
+
+  var characteristic: Characteristic {
+    get {return _characteristic ?? Characteristic()}
+    set {_characteristic = newValue}
+  }
+  /// Returns true if `characteristic` has been explicitly set.
+  var hasCharacteristic: Bool {return self._characteristic != nil}
+  /// Clears the value of `characteristic`. Subsequent reads from it will return its default value.
+  mutating func clearCharacteristic() {self._characteristic = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _characteristic: Characteristic? = nil
+}
+
+struct Service {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var serviceID: String = String()
+
+  var characteristics: [Characteristic] = []
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Services {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var services: [Service] = []
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Characteristic {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var characteristicID: String = String()
+
+  var properties: String = String()
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -153,22 +204,32 @@ struct CharacteristicValue {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var serviceID: String = String()
-
-  var characteristicID: String = String()
+  var characteristic: Characteristic {
+    get {return _characteristic ?? Characteristic()}
+    set {_characteristic = newValue}
+  }
+  /// Returns true if `characteristic` has been explicitly set.
+  var hasCharacteristic: Bool {return self._characteristic != nil}
+  /// Clears the value of `characteristic`. Subsequent reads from it will return its default value.
+  mutating func clearCharacteristic() {self._characteristic = nil}
 
   var data: [Int32] = []
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
+
+  fileprivate var _characteristic: Characteristic? = nil
 }
 
 #if swift(>=5.5) && canImport(_Concurrency)
 extension StateConnect: @unchecked Sendable {}
 extension StateBluetooth: @unchecked Sendable {}
 extension BluetoothBLEModel: @unchecked Sendable {}
-extension ServicesDiscovered: @unchecked Sendable {}
+extension Log: @unchecked Sendable {}
+extension Service: @unchecked Sendable {}
+extension Services: @unchecked Sendable {}
+extension Characteristic: @unchecked Sendable {}
 extension CharacteristicValue: @unchecked Sendable {}
 #endif  // swift(>=5.5) && canImport(_Concurrency)
 
@@ -237,10 +298,11 @@ extension BluetoothBLEModel: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 }
 
-extension ServicesDiscovered: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = "ServicesDiscovered"
+extension Log: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "Log"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "data"),
+    1: .same(proto: "message"),
+    2: .same(proto: "characteristic"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -249,32 +311,40 @@ extension ServicesDiscovered: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedStringField(value: &self.data) }()
+      case 1: try { try decoder.decodeSingularStringField(value: &self.message) }()
+      case 2: try { try decoder.decodeSingularMessageField(value: &self._characteristic) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.data.isEmpty {
-      try visitor.visitRepeatedStringField(value: self.data, fieldNumber: 1)
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    if !self.message.isEmpty {
+      try visitor.visitSingularStringField(value: self.message, fieldNumber: 1)
     }
+    try { if let v = self._characteristic {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: ServicesDiscovered, rhs: ServicesDiscovered) -> Bool {
-    if lhs.data != rhs.data {return false}
+  static func ==(lhs: Log, rhs: Log) -> Bool {
+    if lhs.message != rhs.message {return false}
+    if lhs._characteristic != rhs._characteristic {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension CharacteristicValue: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = "CharacteristicValue"
+extension Service: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "Service"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "serviceId"),
-    2: .same(proto: "characteristicId"),
-    4: .same(proto: "data"),
+    2: .same(proto: "characteristics"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -284,8 +354,7 @@ extension CharacteristicValue: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.serviceID) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.characteristicID) }()
-      case 4: try { try decoder.decodeRepeatedInt32Field(value: &self.data) }()
+      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.characteristics) }()
       default: break
       }
     }
@@ -295,9 +364,118 @@ extension CharacteristicValue: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if !self.serviceID.isEmpty {
       try visitor.visitSingularStringField(value: self.serviceID, fieldNumber: 1)
     }
-    if !self.characteristicID.isEmpty {
-      try visitor.visitSingularStringField(value: self.characteristicID, fieldNumber: 2)
+    if !self.characteristics.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.characteristics, fieldNumber: 2)
     }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Service, rhs: Service) -> Bool {
+    if lhs.serviceID != rhs.serviceID {return false}
+    if lhs.characteristics != rhs.characteristics {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Services: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "Services"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "services"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.services) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.services.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.services, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Services, rhs: Services) -> Bool {
+    if lhs.services != rhs.services {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Characteristic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "Characteristic"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "characteristicId"),
+    2: .same(proto: "properties"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.characteristicID) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.properties) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.characteristicID.isEmpty {
+      try visitor.visitSingularStringField(value: self.characteristicID, fieldNumber: 1)
+    }
+    if !self.properties.isEmpty {
+      try visitor.visitSingularStringField(value: self.properties, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Characteristic, rhs: Characteristic) -> Bool {
+    if lhs.characteristicID != rhs.characteristicID {return false}
+    if lhs.properties != rhs.properties {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension CharacteristicValue: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "CharacteristicValue"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "characteristic"),
+    4: .same(proto: "data"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._characteristic) }()
+      case 4: try { try decoder.decodeRepeatedInt32Field(value: &self.data) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._characteristic {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
     if !self.data.isEmpty {
       try visitor.visitPackedInt32Field(value: self.data, fieldNumber: 4)
     }
@@ -305,8 +483,7 @@ extension CharacteristicValue: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
   }
 
   static func ==(lhs: CharacteristicValue, rhs: CharacteristicValue) -> Bool {
-    if lhs.serviceID != rhs.serviceID {return false}
-    if lhs.characteristicID != rhs.characteristicID {return false}
+    if lhs._characteristic != rhs._characteristic {return false}
     if lhs.data != rhs.data {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

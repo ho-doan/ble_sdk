@@ -8,13 +8,26 @@ message BluetoothBLEModel {
     bool bonded = 3;
 }
 
-message ServicesDiscovered{
-    repeated string data = 1;
+message Log{
+    string message = 1;
+    Characteristic characteristic = 2;
+}
+message Service{
+    string serviceId = 1;
+    repeated Characteristic characteristics = 2;
+}
+
+message Services{
+    repeated Service services = 1;
+}
+
+message Characteristic{
+    string characteristicId = 1;
+    string properties = 2;
 }
 
 message CharacteristicValue {
-    string serviceId = 1;
-    string characteristicId = 2;
+    Characteristic characteristic = 1;
     repeated int32 data = 4 [packed=true];
 }
 

@@ -86,67 +86,241 @@ class BluetoothBLEModel extends $pb.GeneratedMessage {
   void clearBonded() => clearField(3);
 }
 
-class ServicesDiscovered extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ServicesDiscovered', createEmptyInstance: create)
-    ..pPS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'data')
+class Log extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Log', createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
+    ..aOM<Characteristic>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characteristic', subBuilder: Characteristic.create)
     ..hasRequiredFields = false
   ;
 
-  ServicesDiscovered._() : super();
-  factory ServicesDiscovered({
-    $core.Iterable<$core.String>? data,
+  Log._() : super();
+  factory Log({
+    $core.String? message,
+    Characteristic? characteristic,
   }) {
     final _result = create();
-    if (data != null) {
-      _result.data.addAll(data);
+    if (message != null) {
+      _result.message = message;
+    }
+    if (characteristic != null) {
+      _result.characteristic = characteristic;
     }
     return _result;
   }
-  factory ServicesDiscovered.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory ServicesDiscovered.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory Log.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Log.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  ServicesDiscovered clone() => ServicesDiscovered()..mergeFromMessage(this);
+  Log clone() => Log()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ServicesDiscovered copyWith(void Function(ServicesDiscovered) updates) => super.copyWith((message) => updates(message as ServicesDiscovered)) as ServicesDiscovered; // ignore: deprecated_member_use
+  Log copyWith(void Function(Log) updates) => super.copyWith((message) => updates(message as Log)) as Log; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static ServicesDiscovered create() => ServicesDiscovered._();
-  ServicesDiscovered createEmptyInstance() => create();
-  static $pb.PbList<ServicesDiscovered> createRepeated() => $pb.PbList<ServicesDiscovered>();
+  static Log create() => Log._();
+  Log createEmptyInstance() => create();
+  static $pb.PbList<Log> createRepeated() => $pb.PbList<Log>();
   @$core.pragma('dart2js:noInline')
-  static ServicesDiscovered getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ServicesDiscovered>(create);
-  static ServicesDiscovered? _defaultInstance;
+  static Log getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Log>(create);
+  static Log? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$core.String> get data => $_getList(0);
+  $core.String get message => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set message($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasMessage() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMessage() => clearField(1);
+
+  @$pb.TagNumber(2)
+  Characteristic get characteristic => $_getN(1);
+  @$pb.TagNumber(2)
+  set characteristic(Characteristic v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasCharacteristic() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCharacteristic() => clearField(2);
+  @$pb.TagNumber(2)
+  Characteristic ensureCharacteristic() => $_ensure(1);
+}
+
+class Service extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Service', createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceId', protoName: 'serviceId')
+    ..pc<Characteristic>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characteristics', $pb.PbFieldType.PM, subBuilder: Characteristic.create)
+    ..hasRequiredFields = false
+  ;
+
+  Service._() : super();
+  factory Service({
+    $core.String? serviceId,
+    $core.Iterable<Characteristic>? characteristics,
+  }) {
+    final _result = create();
+    if (serviceId != null) {
+      _result.serviceId = serviceId;
+    }
+    if (characteristics != null) {
+      _result.characteristics.addAll(characteristics);
+    }
+    return _result;
+  }
+  factory Service.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Service.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Service clone() => Service()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Service copyWith(void Function(Service) updates) => super.copyWith((message) => updates(message as Service)) as Service; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Service create() => Service._();
+  Service createEmptyInstance() => create();
+  static $pb.PbList<Service> createRepeated() => $pb.PbList<Service>();
+  @$core.pragma('dart2js:noInline')
+  static Service getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Service>(create);
+  static Service? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get serviceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set serviceId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasServiceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearServiceId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<Characteristic> get characteristics => $_getList(1);
+}
+
+class Services extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Services', createEmptyInstance: create)
+    ..pc<Service>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'services', $pb.PbFieldType.PM, subBuilder: Service.create)
+    ..hasRequiredFields = false
+  ;
+
+  Services._() : super();
+  factory Services({
+    $core.Iterable<Service>? services,
+  }) {
+    final _result = create();
+    if (services != null) {
+      _result.services.addAll(services);
+    }
+    return _result;
+  }
+  factory Services.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Services.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Services clone() => Services()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Services copyWith(void Function(Services) updates) => super.copyWith((message) => updates(message as Services)) as Services; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Services create() => Services._();
+  Services createEmptyInstance() => create();
+  static $pb.PbList<Services> createRepeated() => $pb.PbList<Services>();
+  @$core.pragma('dart2js:noInline')
+  static Services getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Services>(create);
+  static Services? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<Service> get services => $_getList(0);
+}
+
+class Characteristic extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Characteristic', createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characteristicId', protoName: 'characteristicId')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties')
+    ..hasRequiredFields = false
+  ;
+
+  Characteristic._() : super();
+  factory Characteristic({
+    $core.String? characteristicId,
+    $core.String? properties,
+  }) {
+    final _result = create();
+    if (characteristicId != null) {
+      _result.characteristicId = characteristicId;
+    }
+    if (properties != null) {
+      _result.properties = properties;
+    }
+    return _result;
+  }
+  factory Characteristic.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Characteristic.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Characteristic clone() => Characteristic()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Characteristic copyWith(void Function(Characteristic) updates) => super.copyWith((message) => updates(message as Characteristic)) as Characteristic; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Characteristic create() => Characteristic._();
+  Characteristic createEmptyInstance() => create();
+  static $pb.PbList<Characteristic> createRepeated() => $pb.PbList<Characteristic>();
+  @$core.pragma('dart2js:noInline')
+  static Characteristic getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Characteristic>(create);
+  static Characteristic? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get characteristicId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set characteristicId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasCharacteristicId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCharacteristicId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get properties => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set properties($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasProperties() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearProperties() => clearField(2);
 }
 
 class CharacteristicValue extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CharacteristicValue', createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceId', protoName: 'serviceId')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characteristicId', protoName: 'characteristicId')
+    ..aOM<Characteristic>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characteristic', subBuilder: Characteristic.create)
     ..p<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'data', $pb.PbFieldType.K3)
     ..hasRequiredFields = false
   ;
 
   CharacteristicValue._() : super();
   factory CharacteristicValue({
-    $core.String? serviceId,
-    $core.String? characteristicId,
+    Characteristic? characteristic,
     $core.Iterable<$core.int>? data,
   }) {
     final _result = create();
-    if (serviceId != null) {
-      _result.serviceId = serviceId;
-    }
-    if (characteristicId != null) {
-      _result.characteristicId = characteristicId;
+    if (characteristic != null) {
+      _result.characteristic = characteristic;
     }
     if (data != null) {
       _result.data.addAll(data);
@@ -175,24 +349,17 @@ class CharacteristicValue extends $pb.GeneratedMessage {
   static CharacteristicValue? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get serviceId => $_getSZ(0);
+  Characteristic get characteristic => $_getN(0);
   @$pb.TagNumber(1)
-  set serviceId($core.String v) { $_setString(0, v); }
+  set characteristic(Characteristic v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasServiceId() => $_has(0);
+  $core.bool hasCharacteristic() => $_has(0);
   @$pb.TagNumber(1)
-  void clearServiceId() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.String get characteristicId => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set characteristicId($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasCharacteristicId() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearCharacteristicId() => clearField(2);
+  void clearCharacteristic() => clearField(1);
+  @$pb.TagNumber(1)
+  Characteristic ensureCharacteristic() => $_ensure(0);
 
   @$pb.TagNumber(4)
-  $core.List<$core.int> get data => $_getList(2);
+  $core.List<$core.int> get data => $_getList(1);
 }
 
