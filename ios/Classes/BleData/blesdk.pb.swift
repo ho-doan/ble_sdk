@@ -199,6 +199,8 @@ struct ConnectModel {
 
   var deviceID: String = String()
 
+  var createBonded: Bool = false
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -398,6 +400,7 @@ extension ConnectModel: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
   static let protoMessageName: String = "ConnectModel"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "deviceId"),
+    2: .same(proto: "createBonded"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -407,6 +410,7 @@ extension ConnectModel: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.deviceID) }()
+      case 2: try { try decoder.decodeSingularBoolField(value: &self.createBonded) }()
       default: break
       }
     }
@@ -416,11 +420,15 @@ extension ConnectModel: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
     if !self.deviceID.isEmpty {
       try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 1)
     }
+    if self.createBonded != false {
+      try visitor.visitSingularBoolField(value: self.createBonded, fieldNumber: 2)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: ConnectModel, rhs: ConnectModel) -> Bool {
     if lhs.deviceID != rhs.deviceID {return false}
+    if lhs.createBonded != rhs.createBonded {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

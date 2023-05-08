@@ -122,7 +122,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
 
     private fun connect(call: MethodCall, result: Result) {
         val connectModel = ConnectModel.parseFrom(call.arguments as ByteArray)
-        val connect = bleClient.connect(connectModel.deviceId)
+        val connect = bleClient.connect(connectModel)
         if (!connect) {
             result.success(false)
             return

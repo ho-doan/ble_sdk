@@ -16,6 +16,7 @@ import android.util.Log
 import com.hodoan.ble_sdk.ProtobufModel
 import com.hodoan.ble_sdk.ProtobufModel.Characteristic
 import com.hodoan.ble_sdk.ProtobufModel.CharacteristicValue
+import com.hodoan.ble_sdk.ProtobufModel.ConnectModel
 import com.hodoan.ble_sdk.utils.UuidConvert
 import java.lang.reflect.Method
 
@@ -23,7 +24,7 @@ interface IBleClient {
     fun listen(context: Context)
     fun scan(services: List<String>)
     fun stopScan()
-    fun connect(deviceId: String): Boolean
+    fun connect(connectModel: ConnectModel): Boolean
     fun discoverServices(): Boolean
     fun refreshDeviceCache(gatt: BluetoothGatt?): Boolean
     fun disconnect(): Boolean
@@ -135,7 +136,7 @@ class BleClient(
                 value: ByteArray,
                 status: Int
             ) {
-                if(status != BluetoothDevice.BOND_BONDED){
+                if (status != BluetoothDevice.BOND_BONDED) {
                     gatt.device.createBond()
                 }
                 callBack.onCharacteristicValue(characteristic, value)
@@ -150,7 +151,7 @@ class BleClient(
                 characteristic: BluetoothGattCharacteristic?,
                 status: Int
             ) {
-                if(status != BluetoothDevice.BOND_BONDED){
+                if (status != BluetoothDevice.BOND_BONDED) {
                     gatt?.device?.createBond()
                 }
                 characteristic?.let {
@@ -252,16 +253,18 @@ class BleClient(
     }
 
     @SuppressLint("MissingPermission")
-    override fun connect(deviceId: String): Boolean {
+    override fun connect(connectModel: ConnectModel): Boolean {
         val device: BluetoothDevice? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            adapter.getRemoteLeDevice(deviceId, BluetoothDevice.ADDRESS_TYPE_PUBLIC)
+            adapter.getRemoteLeDevice(connectModel.deviceId, BluetoothDevice.ADDRESS_TYPE_PUBLIC)
         } else {
-            adapter.getRemoteDevice(deviceId)
+            adapter.getRemoteDevice(connectModel.deviceId)
         }
 
         if (!callBack.checkPermissionConnect()) return false
         stopScan()
-        device?.createBond()
+        if (connectModel.createBonded) {
+            device?.createBond()
+        }
         val gatt =
             device?.connectGatt(context, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
         refreshDeviceCache(gatt)

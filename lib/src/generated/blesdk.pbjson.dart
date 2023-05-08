@@ -66,11 +66,12 @@ const ConnectModel$json = const {
   '1': 'ConnectModel',
   '2': const [
     const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
+    const {'1': 'createBonded', '3': 2, '4': 1, '5': 8, '10': 'createBonded'},
   ],
 };
 
 /// Descriptor for `ConnectModel`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List connectModelDescriptor = $convert.base64Decode('CgxDb25uZWN0TW9kZWwSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZUlk');
+final $typed_data.Uint8List connectModelDescriptor = $convert.base64Decode('CgxDb25uZWN0TW9kZWwSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZUlkEiIKDGNyZWF0ZUJvbmRlZBgCIAEoCFIMY3JlYXRlQm9uZGVk');
 @$core.Deprecated('Use bluetoothBLEModelDescriptor instead')
 const BluetoothBLEModel$json = const {
   '1': 'BluetoothBLEModel',
