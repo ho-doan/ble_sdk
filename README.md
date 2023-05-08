@@ -1,6 +1,6 @@
 # ble_sdk
 
-A new Flutter plugin project.
+Bluetooth Low Energy (BLE) plugin that can communicate with single device
 
 ## Getting Started
 
