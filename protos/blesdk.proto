@@ -8,6 +8,7 @@ message ScanModel{
 
 message ConnectModel{
     string deviceId = 1;
+    bool createBonded = 2;
 }
 
 message BluetoothBLEModel {
