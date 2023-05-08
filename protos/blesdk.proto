@@ -2,6 +2,14 @@ syntax = "proto3";
 option java_package = "com.hodoan.ble_sdk";
 option java_outer_classname = "ProtobufModel";
 
+message ScanModel{
+    repeated string services = 1;
+}
+
+message ConnectModel{
+    string deviceId = 1;
+}
+
 message BluetoothBLEModel {
     string id = 1;
     string name = 2;
@@ -23,12 +31,20 @@ message Services{
 
 message Characteristic{
     string characteristicId = 1;
-    string properties = 2;
+    // for android
+    //public static final int PROPERTY_INDICATE = 32;
+    // public static final int PROPERTY_NOTIFY = 16;
+    // public static final int PROPERTY_READ = 2;
+    // public static final int PROPERTY_SIGNED_WRITE = 64;
+    // public static final int PROPERTY_WRITE = 8;
+    // public static final int PROPERTY_WRITE_NO_RESPONSE = 4;
+    repeated CharacteristicProperties properties = 2;
+    string serviceId = 3;
 }
 
 message CharacteristicValue {
     Characteristic characteristic = 1;
-    repeated int32 data = 4 [packed=true];
+    repeated int32 data = 2 [packed=true];
 }
 
 enum StateConnect {
@@ -36,6 +52,16 @@ enum StateConnect {
     CONNECTED = 1;
     DISCONNECTING = 2;
     DISCONNECTED = 3;
+}
+
+enum CharacteristicProperties {
+    NONE = 0;
+    READ = 2;
+    WRITE_NO_RESPONSE = 4;
+    WRITE = 8;
+    NOTIFY = 16;
+    INDICATE = 32;
+    SIGNED_WRITE = 64;
 }
 
 enum StateBluetooth {
