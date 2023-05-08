@@ -3,7 +3,7 @@ package com.hodoan.ble_sdk.event
 import android.os.Looper
 import io.flutter.plugin.common.EventChannel
 
-class ScanResultEvent : EventChannel.StreamHandler {
+class CharacteristicEvent : EventChannel.StreamHandler {
     private var sink: EventChannel.EventSink? = null
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
@@ -14,7 +14,7 @@ class ScanResultEvent : EventChannel.StreamHandler {
         sink = null
     }
 
-    fun success(value: com.hodoan.ble_sdk.ProtobufModel.BluetoothBLEModel) {
+    fun success(value: com.hodoan.ble_sdk.ProtobufModel.CharacteristicValue) {
         android.os.Handler(Looper.getMainLooper()).post { sink?.success(value.toByteArray()) }
     }
 }

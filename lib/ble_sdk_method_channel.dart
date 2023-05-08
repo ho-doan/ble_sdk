@@ -1,8 +1,8 @@
-import 'package:ble_sdk/src/generated/blesdk.pb.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'ble_sdk_platform_interface.dart';
+import 'src/generated/blesdk.pb.dart';
 
 /// An implementation of [BleSdkPlatform] that uses method channels.
 class MethodChannelBleSdk extends BleSdkPlatform {
@@ -10,25 +10,34 @@ class MethodChannelBleSdk extends BleSdkPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('ble_sdk');
 
+  static EventChannel deviceChannel = const EventChannel('ble_sdk_scan');
+  static EventChannel stateConnectChannel =
+      const EventChannel('ble_sdk_connect');
+  static EventChannel stateBluetoothChannel =
+      const EventChannel('ble_sdk_bluetooth');
+  static EventChannel logsChannel = const EventChannel('ble_sdk_logs');
+  static EventChannel characteristicChannel =
+      const EventChannel('ble_sdk_char');
+
   @override
-  Future<void> startScan(List<String> services) =>
-      methodChannel.invokeMethod<void>('startScan', {
-        'services': services,
-      });
+  Future<void> startScan(ScanModel scanModel) =>
+      methodChannel.invokeMethod<void>('startScan', scanModel.writeToBuffer());
   @override
   Future<void> stopScan() => methodChannel.invokeMethod<void>('stopScan');
   @override
   Future<List<Service>> discoverServices() => methodChannel
-      .invokeMethod<Uint8List>('discoverServices')
-      .then((value) => value != null
-          ? Services.fromBuffer(value.toList()).services
-          : const []);
+      .invokeMethod('discoverServices')
+      .then((value) => Services.fromBuffer(value).services);
 
   @override
-  Future<bool> connect(String deviceId) =>
-      methodChannel.invokeMethod<bool>('connect', {
-        'deviceId': deviceId,
-      }).then((value) => value ?? false);
+  Future<bool> connect(ConnectModel connectModel) async {
+    final result = await methodChannel
+        .invokeMethod<bool>('connect', connectModel.writeToBuffer())
+        .then((value) => value ?? false);
+    if (!result) return false;
+    final bonded = await checkBonded();
+    return bonded;
+  }
 
   @override
   Future<bool> disconnect() => methodChannel
@@ -36,40 +45,44 @@ class MethodChannelBleSdk extends BleSdkPlatform {
       .then((value) => value ?? false);
 
   @override
-  Future<CharacteristicValue> writeCharacteristic() =>
-      methodChannel.invokeMethod<Uint8List>('writeCharacteristic').then(
-            (value) => value != null
-                ? CharacteristicValue.fromBuffer(value)
-                : throw Exception('value null'),
-          );
+  Future<CharacteristicValue> writeCharacteristic(CharacteristicValue value) =>
+      methodChannel
+          .invokeMethod('writeCharacteristic', value.writeToBuffer())
+          .then((value) => CharacteristicValue.fromBuffer(value));
+
+  @override
+  Future<bool> writeCharacteristicNoResponse(CharacteristicValue value) =>
+      methodChannel
+          .invokeMethod<bool>(
+              'writeCharacteristicNoResponse', value.writeToBuffer())
+          .then((value) => value ?? false);
 
   @override
   Future<CharacteristicValue> readCharacteristic(
           Characteristic characteristic) =>
       methodChannel
-          .invokeMethod<Uint8List>(
+          .invokeMethod(
             'readCharacteristic',
             characteristic.writeToBuffer(),
           )
-          .then(
-            (value) => value != null
-                ? CharacteristicValue.fromBuffer(value)
-                : throw Exception('value null'),
-          );
+          .then((value) => CharacteristicValue.fromBuffer(value));
 
   @override
   Future<bool> setNotification(Characteristic characteristic) => methodChannel
       .invokeMethod<bool>('setNotification', characteristic.writeToBuffer())
       .then((value) => value ?? false);
-
+  @override
+  Future<bool> setIndication(Characteristic characteristic) => methodChannel
+      .invokeMethod<bool>('setIndication', characteristic.writeToBuffer())
+      .then((value) => value ?? false);
   @override
   Future<bool> checkBonded() => methodChannel
       .invokeMethod<bool>('checkBonded')
       .then((value) => value ?? false);
 
   @override
-  Future<bool> unBonded() => methodChannel
-      .invokeMethod<bool>('unBonded')
+  Future<bool> unBonded(ConnectModel model) => methodChannel
+      .invokeMethod<bool>('unBonded', model.writeToBuffer())
       .then((value) => value ?? false);
 
   @override
@@ -77,8 +90,24 @@ class MethodChannelBleSdk extends BleSdkPlatform {
       .invokeMethod<bool>('isBluetoothAvailable')
       .then((value) => value ?? false);
   @override
-  Stream<BluetoothBLEModel> deviceResult() {
-    // TODO: implement deviceResult
-    return super.deviceResult();
-  }
+  Stream<BluetoothBLEModel> deviceResult() => deviceChannel
+      .receiveBroadcastStream()
+      .map((event) => BluetoothBLEModel.fromBuffer(event));
+  @override
+  Stream<StateBluetooth> stateBluetoothResult() => stateBluetoothChannel
+      .receiveBroadcastStream()
+      .map((event) => StateBluetooth.values[event]);
+  @override
+  Stream<StateConnect> stateConnectResult() => stateConnectChannel
+      .receiveBroadcastStream()
+      .map((event) => StateConnect.values[event]);
+  @override
+  Stream<Log> logResult() => logsChannel
+      .receiveBroadcastStream()
+      .map((event) => Log.fromBuffer(event));
+
+  @override
+  Stream<CharacteristicValue> characteristicResult() => characteristicChannel
+      .receiveBroadcastStream()
+      .map((event) => CharacteristicValue.fromBuffer(event));
 }

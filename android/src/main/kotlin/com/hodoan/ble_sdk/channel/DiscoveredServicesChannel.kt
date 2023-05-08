@@ -12,7 +12,7 @@ class DiscoveredServicesChannel {
         this.result = result
     }
 
-    fun closeRequest(value: ProtobufModel.ServicesDiscovered) {
+    fun closeRequest(value: ProtobufModel.Services) {
         if (check) return
         check = true
         result?.success(value.toByteArray())

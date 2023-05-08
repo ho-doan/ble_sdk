@@ -1,5 +1,6 @@
 package com.hodoan.ble_sdk.event
 
+import android.os.Looper
 import io.flutter.plugin.common.EventChannel
 
 class StateBluetoothEvent : EventChannel.StreamHandler {
@@ -14,6 +15,6 @@ class StateBluetoothEvent : EventChannel.StreamHandler {
     }
 
     fun success(value: com.hodoan.ble_sdk.ProtobufModel.StateBluetooth) {
-        sink?.success(value.ordinal)
+        android.os.Handler(Looper.getMainLooper()).post { sink?.success(value.ordinal) }
     }
 }

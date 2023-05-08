@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:ble_sdk/ble_sdk.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _ScanPageState extends State<ScanPage> {
     super.dispose();
   }
 
-  final ctlServices = TextEditingController();
+  final ctlServices = TextEditingController(text: '1808');
   List<BluetoothBLEModel> devices = [];
 
   @override
@@ -136,6 +137,7 @@ class _ScanPageState extends State<ScanPage> {
                                 .connect(deviceId: device.id)
                                 .then((value) {
                               if (value) {
+                                log('message $value');
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (ctx) =>
@@ -364,53 +366,48 @@ class _CharacteristicWidgetState extends State<CharacteristicWidget> {
               '- C: ${widget.char.characteristicId.replaceAll('0000', '').split('-').first}(${widget.char.properties.map((e) => e.name).join(',')})',
             ),
           ),
+
+          /// demo nipro
           if (widget.char.characteristicId.contains('2a52'))
             GestureDetector(
               onTap: () async {
-                await BleSdk.instance.setNotification(
-                  Characteristic(
-                    characteristicId: widget.char.characteristicId
-                        .replaceFirst('2a52', '2a28'),
-                    serviceId:
-                        widget.char.serviceId.replaceFirst('1808', '180a'),
-                  ),
-                );
-                await BleSdk.instance.setNotification(
-                  Characteristic(
-                    characteristicId: widget.char.characteristicId
-                        .replaceFirst('2a52', '2a25'),
-                    serviceId:
-                        widget.char.serviceId.replaceFirst('1808', '180a'),
-                  ),
-                );
-                await BleSdk.instance.setNotification(widget.char);
-
-                await BleSdk.instance.setNotification(
-                  Characteristic(
-                    characteristicId: widget.char.characteristicId
-                        .replaceFirst('2a52', '2a34'),
-                    serviceId: widget.char.serviceId,
-                  ),
-                );
-                // await BleSdk.instance.writeCharacteristic(
-                //   CharacteristicValue(
-                //     characteristic: widget.char,
-                //     data: [4, 1],
+                // final data = await BleSdk.instance.readCharacteristic(
+                //   Characteristic(
+                //     characteristicId: widget.char.characteristicId
+                //         .replaceFirst('2a52', '2a28'),
+                //     serviceId:
+                //         widget.char.serviceId.replaceFirst('1808', '180a'),
                 //   ),
                 // );
-                await BleSdk.instance.writeCharacteristic(
-                  CharacteristicValue(
-                    characteristic: widget.char,
-                    data: [1, 0],
-                  ),
-                );
+                // print(data);
+                // final data2 = await BleSdk.instance.readCharacteristic(
+                //   Characteristic(
+                //     characteristicId: widget.char.characteristicId
+                //         .replaceFirst('2a52', '2a25'),
+                //     serviceId:
+                //         widget.char.serviceId.replaceFirst('1808', '180a'),
+                //   ),
+                // );
+                // print(data2);
 
-                await BleSdk.instance.writeCharacteristic(
-                  CharacteristicValue(
-                    characteristic: widget.char,
-                    data: [1, 1],
-                  ),
-                );
+                // await Future.forEach([
+                //   BleSdk.instance.setNotification(widget.char),
+                //   BleSdk.instance.setNotification(
+                //     Characteristic(
+                //       characteristicId: widget.char.characteristicId
+                //           .replaceFirst('2a52', '2a18'),
+                //       serviceId: widget.char.serviceId,
+                //     ),
+                //   ),
+                //   BleSdk.instance.setNotification(
+                //     Characteristic(
+                //       characteristicId: widget.char.characteristicId
+                //           .replaceFirst('2a52', '2a34'),
+                //       serviceId: widget.char.serviceId,
+                //     ),
+                //   ),
+                // ], (element) => element);
+
                 // await Future.forEach(
                 //   List.generate(8, (index) => index),
                 //   (i) async => await Future.delayed(
@@ -420,16 +417,36 @@ class _CharacteristicWidgetState extends State<CharacteristicWidget> {
                 //     () => BleSdk.instance.writeCharacteristic(
                 //       CharacteristicValue(
                 //         characteristic: widget.char,
-                //         characteristicNotify: Characteristic(
-                //           characteristicId: widget.char.characteristicId
-                //               .replaceFirst('2a52', '2a18'),
-                //           serviceId: widget.char.serviceId,
-                //         ),
-                //         data: [0, 3, 1, i + 1, 0],
+                //         data: [1, 3, 1, i + 1, 0],
                 //       ),
                 //     ),
                 //   ),
                 // );
+
+                final dataList =
+                    await BleSdk.instance.writeCharacteristicVsNotify(
+                  CharacteristicValue(
+                    characteristic: widget.char,
+                    data: [1, 1],
+                  ),
+                  notifications: [
+                    Characteristic(
+                      characteristicId: widget.char.characteristicId
+                          .replaceFirst('2a52', '2a18'),
+                      serviceId: widget.char.serviceId,
+                      properties: [CharacteristicProperties.NOTIFY],
+                    ),
+                    Characteristic(
+                      characteristicId: widget.char.characteristicId
+                          .replaceFirst('2a52', '2a34'),
+                      serviceId: widget.char.serviceId,
+                      properties: [CharacteristicProperties.NOTIFY],
+                    ),
+                  ],
+                );
+                for (final data in dataList) {
+                  log('data : ${data.data}');
+                }
               },
               child: const Icon(
                 Icons.download,

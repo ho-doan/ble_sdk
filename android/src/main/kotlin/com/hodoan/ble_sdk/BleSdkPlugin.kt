@@ -3,6 +3,7 @@ package com.hodoan.ble_sdk
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -13,15 +14,15 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
-import com.hodoan.ble_sdk.ProtobufModel.CharacteristicValue
+import com.hodoan.ble_sdk.ProtobufModel.*
 import com.hodoan.ble_sdk.ble.BleClient
 import com.hodoan.ble_sdk.ble.IBleClientCallBack
 import com.hodoan.ble_sdk.channel.CharacteristicChannel
 import com.hodoan.ble_sdk.channel.CheckBondedChannel
+import com.hodoan.ble_sdk.channel.ConnectChannel
 import com.hodoan.ble_sdk.channel.DiscoveredServicesChannel
-import com.hodoan.ble_sdk.event.ScanResultEvent
-import com.hodoan.ble_sdk.event.StateBluetoothEvent
-import com.hodoan.ble_sdk.event.StateConnectEvent
+import com.hodoan.ble_sdk.event.*
+import com.hodoan.ble_sdk.utils.DetectCharProperties
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -41,10 +42,15 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     private val scanEvent = ScanResultEvent()
     private val stateBluetoothEvent = StateBluetoothEvent()
     private val stateConnectEvent = StateConnectEvent()
+    private val logEvent = LogEvent()
+    private val characteristicEvent = CharacteristicEvent()
 
     private val characteristicChannel = CharacteristicChannel()
     private val checkBondedChannel = CheckBondedChannel()
     private val discoveredServicesChannel = DiscoveredServicesChannel()
+    private val connectChannel = ConnectChannel()
+
+    private var devices: List<BluetoothBLEModel> = listOf()
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         context = binding.applicationContext
@@ -54,18 +60,23 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
             enableBluetooth()
             manager = getManager(context)
         }
-        requestPermission()
         manager?.let {
             bleClient = BleClient(context, manager.adapter, this)
             bleClient.listen(context)
         }
         channel = MethodChannel(binding.binaryMessenger, "ble_sdk")
+        channel.setMethodCallHandler(this)
         EventChannel(binding.binaryMessenger, "ble_sdk_scan").setStreamHandler(scanEvent)
         EventChannel(binding.binaryMessenger, "ble_sdk_connect").setStreamHandler(stateConnectEvent)
         EventChannel(binding.binaryMessenger, "ble_sdk_bluetooth").setStreamHandler(
             stateBluetoothEvent
         )
-        channel.setMethodCallHandler(this)
+        EventChannel(binding.binaryMessenger, "ble_sdk_logs").setStreamHandler(
+            logEvent
+        )
+        EventChannel(binding.binaryMessenger, "ble_sdk_char").setStreamHandler(
+            characteristicEvent
+        )
     }
 
     private fun getManager(context: Context): BluetoothManager? {
@@ -78,23 +89,24 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
             "stopScan" -> stopScan(result)
             "discoverServices" -> discoverServices(result)
             "connect" -> connect(call, result)
-            "disconnect" -> disconnect(call, result)
+            "disconnect" -> disconnect(result)
             "writeCharacteristic" -> writeCharacteristic(call, result)
+            "writeCharacteristicNoResponse" -> writeCharacteristicNoResponse(call, result)
             "readCharacteristic" -> readCharacteristic(call, result)
             "setNotification" -> setNotification(call, result)
-            "checkBonded" -> checkBonded(call, result)
+            "setIndication" -> setIndication(call, result)
+            "checkBonded" -> checkBonded(result)
             "unBonded" -> unBonded(call, result)
             "isBluetoothAvailable" -> isBluetoothAvailable(result)
             else -> result.notImplemented()
         }
     }
 
+    //#region onMethodCall
     private fun startScan(call: MethodCall, result: Result) {
-        val args = call.arguments as? Map<*, *> ?: return
-        val serviceUuids =
-            (args["services"] as? List<*>)?.filterIsInstance<String>()?.filter { it.isNotEmpty() }
-                ?: return
-        bleClient?.scan(serviceUuids)
+        devices = listOf()
+        val scanModel = ScanModel.parseFrom(call.arguments as ByteArray)
+        bleClient.scan(scanModel.servicesList)
         result.success(null)
     }
 
@@ -108,14 +120,105 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         discoveredServicesChannel.createRequest(result)
     }
 
-    private fun connect(call: MethodCall, result: Result) {}
-    private fun disconnect(call: MethodCall, result: Result) {}
-    private fun writeCharacteristic(call: MethodCall, result: Result) {}
-    private fun readCharacteristic(call: MethodCall, result: Result) {}
-    private fun setNotification(call: MethodCall, result: Result) {}
-    private fun checkBonded(call: MethodCall, result: Result) {}
-    private fun unBonded(call: MethodCall, result: Result) {}
-    private fun isBluetoothAvailable(result: Result) {}
+    private fun connect(call: MethodCall, result: Result) {
+        val connectModel = ConnectModel.parseFrom(call.arguments as ByteArray)
+        val connect = bleClient.connect(connectModel.deviceId)
+        if (!connect) {
+            result.success(false)
+            return
+        }
+        connectChannel.createRequest(result)
+    }
+
+    private fun disconnect(result: Result) {
+        bleClient.disconnect()
+        result.success(false)
+        return
+    }
+
+    private fun writeCharacteristic(call: MethodCall, result: Result) {
+        val charValue = CharacteristicValue.parseFrom(call.arguments as ByteArray)
+        logEvent.success(
+            Log.newBuilder().setCharacteristic(charValue.characteristic)
+                .setMessage("data write " + charValue.dataList.joinToString(", ")).build()
+        )
+        characteristicChannel.createRequest(result)
+        val isResult = bleClient.writeCharacteristic(charValue)
+        if (!isResult) {
+            characteristicChannel.closeRequest(CharacteristicValue.getDefaultInstance())
+            return
+        }
+        if (!charValue.characteristic.propertiesList.contains(CharacteristicProperties.NOTIFY)) {
+            characteristicChannel.closeRequest(CharacteristicValue.getDefaultInstance())
+            return
+        }
+        if (!charValue.characteristic.propertiesList.contains(CharacteristicProperties.INDICATE)) {
+            characteristicChannel.closeRequest(CharacteristicValue.getDefaultInstance())
+            return
+        }
+    }
+
+    private fun writeCharacteristicNoResponse(call: MethodCall, result: Result) {
+        val charValue = CharacteristicValue.parseFrom(call.arguments as ByteArray)
+        logEvent.success(
+            Log.newBuilder().setCharacteristic(charValue.characteristic)
+                .setMessage("data write " + charValue.dataList.joinToString(", ")).build()
+        )
+        val isResult = bleClient.writeCharacteristic(charValue)
+        result.success(isResult)
+    }
+
+    private fun readCharacteristic(call: MethodCall, result: Result) {
+        val charValue = Characteristic.parseFrom(call.arguments as ByteArray)
+        val isResult = bleClient.readCharacteristic(charValue)
+        if (!isResult) {
+            result.success(CharacteristicValue.getDefaultInstance().toByteArray())
+            return
+        }
+        characteristicChannel.createRequest(result)
+    }
+
+    private fun setNotification(call: MethodCall, result: Result) {
+        val charValue = Characteristic.parseFrom(call.arguments as ByteArray)
+        val isResult = bleClient.notificationCharacteristic(charValue)
+        if (isResult) {
+            logEvent.success(
+                Log.newBuilder().setCharacteristic(charValue)
+                    .setMessage("notification ${charValue.characteristicId}").build()
+            )
+        }
+        result.success(isResult)
+    }
+
+    private fun setIndication(call: MethodCall, result: Result) {
+        val charValue = Characteristic.parseFrom(call.arguments as ByteArray)
+        val isResult = bleClient.indicationCharacteristic(charValue)
+        if (isResult) {
+            logEvent.success(
+                Log.newBuilder().setCharacteristic(charValue)
+                    .setMessage("indicator ${charValue.characteristicId}").build()
+            )
+        }
+        result.success(isResult)
+    }
+
+    private fun checkBonded(result: Result) {
+        if (bleClient.isBonded) {
+            result.success(true)
+            return
+        }
+        checkBondedChannel.createRequest(result)
+    }
+
+    private fun unBonded(call: MethodCall, result: Result) {
+        val model = ConnectModel.parseFrom(call.arguments as ByteArray)
+        result.success(bleClient.unBonded(model.deviceId))
+    }
+
+    private fun isBluetoothAvailable(result: Result) {
+        result.success(getManager(context)?.adapter?.isEnabled ?: false)
+    }
+    //#endregion
 
     //region init callback sdk
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -187,32 +290,62 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         ActivityCompat.startActivityForResult(activity, enableBtIntent, 1, Bundle())
     }
 
-    override fun onScanResult(result: ProtobufModel.BluetoothBLEModel) {
-        scanEvent.success(result)
+    override fun onScanResult(result: BluetoothBLEModel) {
+        if (!devices.any { it.id == result.id }) {
+            scanEvent.success(result)
+            devices = devices + result
+        }
     }
 
-    override fun onConnectionStateChange(state: ProtobufModel.StateConnect) {
+    override fun onConnectionStateChange(state: StateConnect) {
+        if (state == StateConnect.CONNECTED) {
+            connectChannel.closeRequest(true)
+        }
         stateConnectEvent.success(state)
     }
 
     override fun onServicesDiscovered(services: List<BluetoothGattService>) {
-        val model = ProtobufModel.ServicesDiscovered.newBuilder()
-        model.addAllData(services.map { it.uuid.toString() }.toList())
+        val model = Services.newBuilder()
+        model.addAllServices(services.map { service ->
+            Service.newBuilder().setServiceId(service.uuid.toString())
+                .addAllCharacteristics(service.characteristics.map {
+                    Characteristic.newBuilder()
+                        .setCharacteristicId(it.uuid.toString())
+                        .setServiceId(service.uuid.toString())
+                        .addAllProperties(DetectCharProperties.detect(it.properties))
+                        .build()
+                }).build()
+        }.toList())
         discoveredServicesChannel.closeRequest(model.build())
     }
 
-    override fun onCharacteristicValue(characteristicId: String, value: ByteArray) {
+    override fun onCharacteristicValue(
+        characteristic: BluetoothGattCharacteristic,
+        value: ByteArray
+    ) {
         val model = CharacteristicValue.newBuilder()
-        model.characteristicId = characteristicId
-        model.addAllData(value.toList().map { it.toInt().and(255) })
+        val valueListInt = value.toList().map { it.toInt().and(255) }
+        model.characteristic =
+            Characteristic.newBuilder().setCharacteristicId(characteristic.uuid.toString())
+                .addAllProperties(DetectCharProperties.detect(characteristic.properties))
+                .build()
+        model.addAllData(valueListInt)
+        characteristicEvent.success(model.build())
         characteristicChannel.closeRequest(model.build())
+        logEvent.success(
+            Log.newBuilder().setCharacteristic(
+                Characteristic.newBuilder().setServiceId(characteristic.service.uuid.toString())
+                    .setCharacteristicId(characteristic.uuid.toString())
+                    .addAllProperties(DetectCharProperties.detect(characteristic.properties))
+            ).setMessage(valueListInt.joinToString(", ")).build()
+        )
     }
 
     override fun bonded(bonded: Boolean) {
         checkBondedChannel.closeRequest(bonded)
     }
 
-    override fun bleState(state: ProtobufModel.StateBluetooth) {
+    override fun bleState(state: StateBluetooth) {
         stateBluetoothEvent.success(state)
     }
     //#endregion
@@ -220,12 +353,15 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     //#region override activity aware
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
+        requestPermission()
     }
 
     override fun onDetachedFromActivityForConfigChanges() {}
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
-    override fun onDetachedFromActivity() {}
+    override fun onDetachedFromActivity() {
+        bleClient?.dispose()
+    }
     //#endregion
 }

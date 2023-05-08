@@ -9,7 +9,97 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'blesdk.pbenum.dart';
+
 export 'blesdk.pbenum.dart';
+
+class ScanModel extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ScanModel', createEmptyInstance: create)
+    ..pPS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'services')
+    ..hasRequiredFields = false
+  ;
+
+  ScanModel._() : super();
+  factory ScanModel({
+    $core.Iterable<$core.String>? services,
+  }) {
+    final _result = create();
+    if (services != null) {
+      _result.services.addAll(services);
+    }
+    return _result;
+  }
+  factory ScanModel.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ScanModel.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ScanModel clone() => ScanModel()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ScanModel copyWith(void Function(ScanModel) updates) => super.copyWith((message) => updates(message as ScanModel)) as ScanModel; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static ScanModel create() => ScanModel._();
+  ScanModel createEmptyInstance() => create();
+  static $pb.PbList<ScanModel> createRepeated() => $pb.PbList<ScanModel>();
+  @$core.pragma('dart2js:noInline')
+  static ScanModel getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ScanModel>(create);
+  static ScanModel? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.String> get services => $_getList(0);
+}
+
+class ConnectModel extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ConnectModel', createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'deviceId', protoName: 'deviceId')
+    ..hasRequiredFields = false
+  ;
+
+  ConnectModel._() : super();
+  factory ConnectModel({
+    $core.String? deviceId,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    return _result;
+  }
+  factory ConnectModel.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ConnectModel.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ConnectModel clone() => ConnectModel()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ConnectModel copyWith(void Function(ConnectModel) updates) => super.copyWith((message) => updates(message as ConnectModel)) as ConnectModel; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static ConnectModel create() => ConnectModel._();
+  ConnectModel createEmptyInstance() => create();
+  static $pb.PbList<ConnectModel> createRepeated() => $pb.PbList<ConnectModel>();
+  @$core.pragma('dart2js:noInline')
+  static ConnectModel getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ConnectModel>(create);
+  static ConnectModel? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get deviceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => clearField(1);
+}
 
 class BluetoothBLEModel extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'BluetoothBLEModel', createEmptyInstance: create)
@@ -248,21 +338,26 @@ class Services extends $pb.GeneratedMessage {
 class Characteristic extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Characteristic', createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characteristicId', protoName: 'characteristicId')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties')
+    ..pc<CharacteristicProperties>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties', $pb.PbFieldType.KE, valueOf: CharacteristicProperties.valueOf, enumValues: CharacteristicProperties.values, defaultEnumValue: CharacteristicProperties.NONE)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceId', protoName: 'serviceId')
     ..hasRequiredFields = false
   ;
 
   Characteristic._() : super();
   factory Characteristic({
     $core.String? characteristicId,
-    $core.String? properties,
+    $core.Iterable<CharacteristicProperties>? properties,
+    $core.String? serviceId,
   }) {
     final _result = create();
     if (characteristicId != null) {
       _result.characteristicId = characteristicId;
     }
     if (properties != null) {
-      _result.properties = properties;
+      _result.properties.addAll(properties);
+    }
+    if (serviceId != null) {
+      _result.serviceId = serviceId;
     }
     return _result;
   }
@@ -297,19 +392,22 @@ class Characteristic extends $pb.GeneratedMessage {
   void clearCharacteristicId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get properties => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set properties($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasProperties() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearProperties() => clearField(2);
+  $core.List<CharacteristicProperties> get properties => $_getList(1);
+
+  @$pb.TagNumber(3)
+  $core.String get serviceId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set serviceId($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasServiceId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearServiceId() => clearField(3);
 }
 
 class CharacteristicValue extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CharacteristicValue', createEmptyInstance: create)
     ..aOM<Characteristic>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characteristic', subBuilder: Characteristic.create)
-    ..p<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'data', $pb.PbFieldType.K3)
+    ..p<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'data', $pb.PbFieldType.K3)
     ..hasRequiredFields = false
   ;
 
@@ -359,7 +457,7 @@ class CharacteristicValue extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Characteristic ensureCharacteristic() => $_ensure(0);
 
-  @$pb.TagNumber(4)
+  @$pb.TagNumber(2)
   $core.List<$core.int> get data => $_getList(1);
 }
 

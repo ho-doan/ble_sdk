@@ -24,7 +24,7 @@ abstract class BleSdkPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<void> startScan(List<String> services) =>
+  Future<void> startScan(ScanModel scanModel) =>
       throw UnimplementedError('startScan() has not been implemented.');
 
   Future<void> stopScan() =>
@@ -33,14 +33,19 @@ abstract class BleSdkPlatform extends PlatformInterface {
   Future<List<Service>> discoverServices() =>
       throw UnimplementedError('discoverServices() has not been implemented.');
 
-  Future<bool> connect(String deviceId) =>
+  Future<bool> connect(ConnectModel connectModel) =>
       throw UnimplementedError('connect() has not been implemented.');
 
   Future<bool> disconnect() =>
       throw UnimplementedError('disconnect() has not been implemented.');
 
-  Future<CharacteristicValue> writeCharacteristic() => throw UnimplementedError(
-      'writeCharacteristic() has not been implemented.');
+  Future<CharacteristicValue> writeCharacteristic(CharacteristicValue value) =>
+      throw UnimplementedError(
+          'writeCharacteristic() has not been implemented.');
+
+  Future<bool> writeCharacteristicNoResponse(CharacteristicValue value) =>
+      throw UnimplementedError(
+          'writeCharacteristicNoResponse() has not been implemented.');
 
   Future<CharacteristicValue> readCharacteristic(
           Characteristic characteristic) =>
@@ -49,11 +54,13 @@ abstract class BleSdkPlatform extends PlatformInterface {
 
   Future<bool> setNotification(Characteristic characteristic) =>
       throw UnimplementedError('setNotification() has not been implemented.');
+  Future<bool> setIndication(Characteristic characteristic) =>
+      throw UnimplementedError('setIndication() has not been implemented.');
 
   Future<bool> checkBonded() =>
       throw UnimplementedError('checkBonded() has not been implemented.');
 
-  Future<bool> unBonded() =>
+  Future<bool> unBonded(ConnectModel model) =>
       throw UnimplementedError('unBonded() has not been implemented.');
 
   Future<bool> isBluetoothAvailable() => throw UnimplementedError(
@@ -63,4 +70,14 @@ abstract class BleSdkPlatform extends PlatformInterface {
       throw UnimplementedError('deviceResult() has not been implemented.');
   Stream<Log> logResult() =>
       throw UnimplementedError('logResult() has not been implemented.');
+
+  Stream<StateConnect> stateConnectResult() => throw UnimplementedError(
+      'stateConnectResult() has not been implemented.');
+
+  Stream<StateBluetooth> stateBluetoothResult() => throw UnimplementedError(
+      'stateBluetoothResult() has not been implemented.');
+
+  Stream<CharacteristicValue> characteristicResult() =>
+      throw UnimplementedError(
+          'stateBluetoothResult() has not been implemented.');
 }

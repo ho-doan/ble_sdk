@@ -68,6 +68,66 @@ extension StateConnect: CaseIterable {
 
 #endif  // swift(>=4.2)
 
+enum CharacteristicProperties: SwiftProtobuf.Enum {
+  typealias RawValue = Int
+  case none // = 0
+  case read // = 2
+  case writeNoResponse // = 4
+  case write // = 8
+  case notify // = 16
+  case indicate // = 32
+  case signedWrite // = 64
+  case UNRECOGNIZED(Int)
+
+  init() {
+    self = .none
+  }
+
+  init?(rawValue: Int) {
+    switch rawValue {
+    case 0: self = .none
+    case 2: self = .read
+    case 4: self = .writeNoResponse
+    case 8: self = .write
+    case 16: self = .notify
+    case 32: self = .indicate
+    case 64: self = .signedWrite
+    default: self = .UNRECOGNIZED(rawValue)
+    }
+  }
+
+  var rawValue: Int {
+    switch self {
+    case .none: return 0
+    case .read: return 2
+    case .writeNoResponse: return 4
+    case .write: return 8
+    case .notify: return 16
+    case .indicate: return 32
+    case .signedWrite: return 64
+    case .UNRECOGNIZED(let i): return i
+    }
+  }
+
+}
+
+#if swift(>=4.2)
+
+extension CharacteristicProperties: CaseIterable {
+  // The compiler won't synthesize support with the UNRECOGNIZED case.
+  static var allCases: [CharacteristicProperties] = [
+    .none,
+    .read,
+    .writeNoResponse,
+    .write,
+    .notify,
+    .indicate,
+    .signedWrite,
+  ]
+}
+
+#endif  // swift(>=4.2)
+
 enum StateBluetooth: SwiftProtobuf.Enum {
   typealias RawValue = Int
   case turingOn // = 0
@@ -119,6 +179,30 @@ extension StateBluetooth: CaseIterable {
 }
 
 #endif  // swift(>=4.2)
+
+struct ScanModel {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var services: [String] = []
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct ConnectModel {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var deviceID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
 
 struct BluetoothBLEModel {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
@@ -192,7 +276,16 @@ struct Characteristic {
 
   var characteristicID: String = String()
 
-  var properties: String = String()
+  /// for android
+  ///public static final int PROPERTY_INDICATE = 32;
+  /// public static final int PROPERTY_NOTIFY = 16;
+  /// public static final int PROPERTY_READ = 2;
+  /// public static final int PROPERTY_SIGNED_WRITE = 64;
+  /// public static final int PROPERTY_WRITE = 8;
+  /// public static final int PROPERTY_WRITE_NO_RESPONSE = 4;
+  var properties: [CharacteristicProperties] = []
+
+  var serviceID: String = String()
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -224,7 +317,10 @@ struct CharacteristicValue {
 
 #if swift(>=5.5) && canImport(_Concurrency)
 extension StateConnect: @unchecked Sendable {}
+extension CharacteristicProperties: @unchecked Sendable {}
 extension StateBluetooth: @unchecked Sendable {}
+extension ScanModel: @unchecked Sendable {}
+extension ConnectModel: @unchecked Sendable {}
 extension BluetoothBLEModel: @unchecked Sendable {}
 extension Log: @unchecked Sendable {}
 extension Service: @unchecked Sendable {}
@@ -244,6 +340,18 @@ extension StateConnect: SwiftProtobuf._ProtoNameProviding {
   ]
 }
 
+extension CharacteristicProperties: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "NONE"),
+    2: .same(proto: "READ"),
+    4: .same(proto: "WRITE_NO_RESPONSE"),
+    8: .same(proto: "WRITE"),
+    16: .same(proto: "NOTIFY"),
+    32: .same(proto: "INDICATE"),
+    64: .same(proto: "SIGNED_WRITE"),
+  ]
+}
+
 extension StateBluetooth: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "TURING_ON"),
@@ -252,6 +360,70 @@ extension StateBluetooth: SwiftProtobuf._ProtoNameProviding {
     3: .same(proto: "OFF"),
     4: .same(proto: "NOT_SUPPORT"),
   ]
+}
+
+extension ScanModel: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "ScanModel"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "services"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedStringField(value: &self.services) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.services.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.services, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ScanModel, rhs: ScanModel) -> Bool {
+    if lhs.services != rhs.services {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ConnectModel: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "ConnectModel"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "deviceId"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.deviceID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.deviceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ConnectModel, rhs: ConnectModel) -> Bool {
+    if lhs.deviceID != rhs.deviceID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
 }
 
 extension BluetoothBLEModel: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -415,6 +587,7 @@ extension Characteristic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "characteristicId"),
     2: .same(proto: "properties"),
+    3: .same(proto: "serviceId"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -424,7 +597,8 @@ extension Characteristic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.characteristicID) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.properties) }()
+      case 2: try { try decoder.decodeRepeatedEnumField(value: &self.properties) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.serviceID) }()
       default: break
       }
     }
@@ -435,7 +609,10 @@ extension Characteristic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
       try visitor.visitSingularStringField(value: self.characteristicID, fieldNumber: 1)
     }
     if !self.properties.isEmpty {
-      try visitor.visitSingularStringField(value: self.properties, fieldNumber: 2)
+      try visitor.visitPackedEnumField(value: self.properties, fieldNumber: 2)
+    }
+    if !self.serviceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.serviceID, fieldNumber: 3)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -443,6 +620,7 @@ extension Characteristic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   static func ==(lhs: Characteristic, rhs: Characteristic) -> Bool {
     if lhs.characteristicID != rhs.characteristicID {return false}
     if lhs.properties != rhs.properties {return false}
+    if lhs.serviceID != rhs.serviceID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -452,7 +630,7 @@ extension CharacteristicValue: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
   static let protoMessageName: String = "CharacteristicValue"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "characteristic"),
-    4: .same(proto: "data"),
+    2: .same(proto: "data"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -462,7 +640,7 @@ extension CharacteristicValue: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularMessageField(value: &self._characteristic) }()
-      case 4: try { try decoder.decodeRepeatedInt32Field(value: &self.data) }()
+      case 2: try { try decoder.decodeRepeatedInt32Field(value: &self.data) }()
       default: break
       }
     }
@@ -477,7 +655,7 @@ extension CharacteristicValue: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
     } }()
     if !self.data.isEmpty {
-      try visitor.visitPackedInt32Field(value: self.data, fieldNumber: 4)
+      try visitor.visitPackedInt32Field(value: self.data, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }

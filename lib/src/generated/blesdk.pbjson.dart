@@ -21,6 +21,22 @@ const StateConnect$json = const {
 
 /// Descriptor for `StateConnect`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List stateConnectDescriptor = $convert.base64Decode('CgxTdGF0ZUNvbm5lY3QSDgoKQ09OTkVDVElORxAAEg0KCUNPTk5FQ1RFRBABEhEKDURJU0NPTk5FQ1RJTkcQAhIQCgxESVNDT05ORUNURUQQAw==');
+@$core.Deprecated('Use characteristicPropertiesDescriptor instead')
+const CharacteristicProperties$json = const {
+  '1': 'CharacteristicProperties',
+  '2': const [
+    const {'1': 'NONE', '2': 0},
+    const {'1': 'READ', '2': 2},
+    const {'1': 'WRITE_NO_RESPONSE', '2': 4},
+    const {'1': 'WRITE', '2': 8},
+    const {'1': 'NOTIFY', '2': 16},
+    const {'1': 'INDICATE', '2': 32},
+    const {'1': 'SIGNED_WRITE', '2': 64},
+  ],
+};
+
+/// Descriptor for `CharacteristicProperties`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List characteristicPropertiesDescriptor = $convert.base64Decode('ChhDaGFyYWN0ZXJpc3RpY1Byb3BlcnRpZXMSCAoETk9ORRAAEggKBFJFQUQQAhIVChFXUklURV9OT19SRVNQT05TRRAEEgkKBVdSSVRFEAgSCgoGTk9USUZZEBASDAoISU5ESUNBVEUQIBIQCgxTSUdORURfV1JJVEUQQA==');
 @$core.Deprecated('Use stateBluetoothDescriptor instead')
 const StateBluetooth$json = const {
   '1': 'StateBluetooth',
@@ -35,6 +51,26 @@ const StateBluetooth$json = const {
 
 /// Descriptor for `StateBluetooth`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List stateBluetoothDescriptor = $convert.base64Decode('Cg5TdGF0ZUJsdWV0b290aBINCglUVVJJTkdfT04QABIGCgJPThABEg4KClRVUklOR19PRkYQAhIHCgNPRkYQAxIPCgtOT1RfU1VQUE9SVBAE');
+@$core.Deprecated('Use scanModelDescriptor instead')
+const ScanModel$json = const {
+  '1': 'ScanModel',
+  '2': const [
+    const {'1': 'services', '3': 1, '4': 3, '5': 9, '10': 'services'},
+  ],
+};
+
+/// Descriptor for `ScanModel`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List scanModelDescriptor = $convert.base64Decode('CglTY2FuTW9kZWwSGgoIc2VydmljZXMYASADKAlSCHNlcnZpY2Vz');
+@$core.Deprecated('Use connectModelDescriptor instead')
+const ConnectModel$json = const {
+  '1': 'ConnectModel',
+  '2': const [
+    const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
+  ],
+};
+
+/// Descriptor for `ConnectModel`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List connectModelDescriptor = $convert.base64Decode('CgxDb25uZWN0TW9kZWwSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZUlk');
 @$core.Deprecated('Use bluetoothBLEModelDescriptor instead')
 const BluetoothBLEModel$json = const {
   '1': 'BluetoothBLEModel',
@@ -84,12 +120,13 @@ const Characteristic$json = const {
   '1': 'Characteristic',
   '2': const [
     const {'1': 'characteristicId', '3': 1, '4': 1, '5': 9, '10': 'characteristicId'},
-    const {'1': 'properties', '3': 2, '4': 1, '5': 9, '10': 'properties'},
+    const {'1': 'properties', '3': 2, '4': 3, '5': 14, '6': '.CharacteristicProperties', '10': 'properties'},
+    const {'1': 'serviceId', '3': 3, '4': 1, '5': 9, '10': 'serviceId'},
   ],
 };
 
 /// Descriptor for `Characteristic`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List characteristicDescriptor = $convert.base64Decode('Cg5DaGFyYWN0ZXJpc3RpYxIqChBjaGFyYWN0ZXJpc3RpY0lkGAEgASgJUhBjaGFyYWN0ZXJpc3RpY0lkEh4KCnByb3BlcnRpZXMYAiABKAlSCnByb3BlcnRpZXM=');
+final $typed_data.Uint8List characteristicDescriptor = $convert.base64Decode('Cg5DaGFyYWN0ZXJpc3RpYxIqChBjaGFyYWN0ZXJpc3RpY0lkGAEgASgJUhBjaGFyYWN0ZXJpc3RpY0lkEjkKCnByb3BlcnRpZXMYAiADKA4yGS5DaGFyYWN0ZXJpc3RpY1Byb3BlcnRpZXNSCnByb3BlcnRpZXMSHAoJc2VydmljZUlkGAMgASgJUglzZXJ2aWNlSWQ=');
 @$core.Deprecated('Use characteristicValueDescriptor instead')
 const CharacteristicValue$json = const {
   '1': 'CharacteristicValue',
@@ -97,7 +134,7 @@ const CharacteristicValue$json = const {
     const {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.Characteristic', '10': 'characteristic'},
     const {
       '1': 'data',
-      '3': 4,
+      '3': 2,
       '4': 3,
       '5': 5,
       '8': const {'2': true},
@@ -107,4 +144,4 @@ const CharacteristicValue$json = const {
 };
 
 /// Descriptor for `CharacteristicValue`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List characteristicValueDescriptor = $convert.base64Decode('ChNDaGFyYWN0ZXJpc3RpY1ZhbHVlEjcKDmNoYXJhY3RlcmlzdGljGAEgASgLMg8uQ2hhcmFjdGVyaXN0aWNSDmNoYXJhY3RlcmlzdGljEhYKBGRhdGEYBCADKAVCAhABUgRkYXRh');
+final $typed_data.Uint8List characteristicValueDescriptor = $convert.base64Decode('ChNDaGFyYWN0ZXJpc3RpY1ZhbHVlEjcKDmNoYXJhY3RlcmlzdGljGAEgASgLMg8uQ2hhcmFjdGVyaXN0aWNSDmNoYXJhY3RlcmlzdGljEhYKBGRhdGEYAiADKAVCAhABUgRkYXRh');

@@ -1,5 +1,6 @@
 package com.hodoan.ble_sdk.channel
 
+import android.util.Log
 import com.hodoan.ble_sdk.ProtobufModel
 
 class CharacteristicChannel {
@@ -15,7 +16,11 @@ class CharacteristicChannel {
     fun closeRequest(value: ProtobufModel.CharacteristicValue) {
         if (check) return
         check = true
-        result?.success(value.toByteArray())
-        result = null
+        try {
+            result?.success(value.toByteArray())
+            result = null
+        } catch (e: java.lang.Exception) {
+            Log.e(CharacteristicChannel::class.simpleName, "closeRequest: $e")
+        }
     }
 }
