@@ -44,7 +44,7 @@ interface IBleClientCallBack {
     fun enableBluetooth()
     fun onScanResult(result: ProtobufModel.BluetoothBLEModel)
     fun onConnectionStateChange(state: ProtobufModel.StateConnect)
-    fun onServicesDiscovered(services: List<BluetoothGattService>)
+    fun onServicesDiscovered(services: List<BluetoothGattService>, deviceId: String)
     fun onCharacteristicValue(characteristic: BluetoothGattCharacteristic, value: ByteArray)
     fun bonded(bonded: Boolean)
     fun bleState(state: ProtobufModel.StateBluetooth)
@@ -106,18 +106,18 @@ class BleClient(
                     BluetoothProfile.STATE_CONNECTED -> {
                         gattCurrent = gatt
                         isBonded = gatt?.device?.bondState == BluetoothDevice.BOND_BONDED
-                        callBack.onConnectionStateChange(ProtobufModel.StateConnect.CONNECTED)
+                        callBack.onConnectionStateChange(ProtobufModel.StateConnect.connected)
                     }
                     BluetoothProfile.STATE_CONNECTING -> {
-                        callBack.onConnectionStateChange(ProtobufModel.StateConnect.CONNECTING)
+                        callBack.onConnectionStateChange(ProtobufModel.StateConnect.connecting)
                     }
                     BluetoothProfile.STATE_DISCONNECTING -> {
-                        callBack.onConnectionStateChange(ProtobufModel.StateConnect.DISCONNECTING)
+                        callBack.onConnectionStateChange(ProtobufModel.StateConnect.disconnecting)
                     }
                     BluetoothProfile.STATE_DISCONNECTED -> {
                         isBonded = false
                         gattCurrent = null
-                        callBack.onConnectionStateChange(ProtobufModel.StateConnect.DISCONNECTED)
+                        callBack.onConnectionStateChange(ProtobufModel.StateConnect.disconnected)
                     }
                 }
             }
@@ -125,7 +125,7 @@ class BleClient(
             override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
                 super.onServicesDiscovered(gatt, status)
                 gatt?.let {
-                    callBack.onServicesDiscovered(it.services)
+                    callBack.onServicesDiscovered(it.services, it.device.address)
                 }
             }
 
@@ -191,10 +191,11 @@ class BleClient(
                         BluetoothAdapter.EXTRA_STATE,
                         BluetoothAdapter.ERROR
                     )) {
-                        BluetoothAdapter.STATE_OFF -> callBack.bleState(ProtobufModel.StateBluetooth.OFF)
-                        BluetoothAdapter.STATE_ON -> callBack.bleState(ProtobufModel.StateBluetooth.ON)
-                        BluetoothAdapter.STATE_TURNING_OFF -> callBack.bleState(ProtobufModel.StateBluetooth.TURING_OFF)
-                        BluetoothAdapter.STATE_TURNING_ON -> callBack.bleState(ProtobufModel.StateBluetooth.TURING_ON)
+                        BluetoothAdapter.STATE_OFF -> callBack.bleState(ProtobufModel.StateBluetooth.off)
+                        BluetoothAdapter.STATE_ON -> callBack.bleState(ProtobufModel.StateBluetooth.on)
+                        BluetoothAdapter.STATE_TURNING_OFF -> callBack.bleState(ProtobufModel.StateBluetooth.turningOff)
+                        BluetoothAdapter.STATE_TURNING_ON -> callBack.bleState(ProtobufModel.StateBluetooth.turningOn)
+                        else -> callBack.bleState(ProtobufModel.StateBluetooth.notSupport)
                     }
                 }
                 BluetoothDevice.ACTION_BOND_STATE_CHANGED -> {

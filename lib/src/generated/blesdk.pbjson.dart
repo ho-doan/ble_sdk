@@ -12,15 +12,28 @@ import 'dart:typed_data' as $typed_data;
 const StateConnect$json = const {
   '1': 'StateConnect',
   '2': const [
-    const {'1': 'CONNECTING', '2': 0},
-    const {'1': 'CONNECTED', '2': 1},
-    const {'1': 'DISCONNECTING', '2': 2},
-    const {'1': 'DISCONNECTED', '2': 3},
+    const {'1': 'unKnow', '2': 0},
+    const {'1': 'connecting', '2': 1},
+    const {'1': 'connected', '2': 2},
+    const {'1': 'disconnecting', '2': 3},
+    const {'1': 'disconnected', '2': 4},
   ],
 };
 
 /// Descriptor for `StateConnect`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List stateConnectDescriptor = $convert.base64Decode('CgxTdGF0ZUNvbm5lY3QSDgoKQ09OTkVDVElORxAAEg0KCUNPTk5FQ1RFRBABEhEKDURJU0NPTk5FQ1RJTkcQAhIQCgxESVNDT05ORUNURUQQAw==');
+final $typed_data.Uint8List stateConnectDescriptor = $convert.base64Decode('CgxTdGF0ZUNvbm5lY3QSCgoGdW5Lbm93EAASDgoKY29ubmVjdGluZxABEg0KCWNvbm5lY3RlZBACEhEKDWRpc2Nvbm5lY3RpbmcQAxIQCgxkaXNjb25uZWN0ZWQQBA==');
+@$core.Deprecated('Use permissionResultDescriptor instead')
+const PermissionResult$json = const {
+  '1': 'PermissionResult',
+  '2': const [
+    const {'1': 'granted', '2': 0},
+    const {'1': 'notGranted', '2': 1},
+    const {'1': 'denied', '2': 2},
+  ],
+};
+
+/// Descriptor for `PermissionResult`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List permissionResultDescriptor = $convert.base64Decode('ChBQZXJtaXNzaW9uUmVzdWx0EgsKB2dyYW50ZWQQABIOCgpub3RHcmFudGVkEAESCgoGZGVuaWVkEAI=');
 @$core.Deprecated('Use characteristicPropertiesDescriptor instead')
 const CharacteristicProperties$json = const {
   '1': 'CharacteristicProperties',
@@ -41,16 +54,16 @@ final $typed_data.Uint8List characteristicPropertiesDescriptor = $convert.base64
 const StateBluetooth$json = const {
   '1': 'StateBluetooth',
   '2': const [
-    const {'1': 'TURING_ON', '2': 0},
-    const {'1': 'ON', '2': 1},
-    const {'1': 'TURING_OFF', '2': 2},
-    const {'1': 'OFF', '2': 3},
-    const {'1': 'NOT_SUPPORT', '2': 4},
+    const {'1': 'turningOn', '2': 0},
+    const {'1': 'on', '2': 1},
+    const {'1': 'turningOff', '2': 2},
+    const {'1': 'off', '2': 3},
+    const {'1': 'notSupport', '2': 4},
   ],
 };
 
 /// Descriptor for `StateBluetooth`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List stateBluetoothDescriptor = $convert.base64Decode('Cg5TdGF0ZUJsdWV0b290aBINCglUVVJJTkdfT04QABIGCgJPThABEg4KClRVUklOR19PRkYQAhIHCgNPRkYQAxIPCgtOT1RfU1VQUE9SVBAE');
+final $typed_data.Uint8List stateBluetoothDescriptor = $convert.base64Decode('Cg5TdGF0ZUJsdWV0b290aBINCgl0dXJuaW5nT24QABIGCgJvbhABEg4KCnR1cm5pbmdPZmYQAhIHCgNvZmYQAxIOCgpub3RTdXBwb3J0EAQ=');
 @$core.Deprecated('Use scanModelDescriptor instead')
 const ScanModel$json = const {
   '1': 'ScanModel',
@@ -123,11 +136,12 @@ const Characteristic$json = const {
     const {'1': 'characteristicId', '3': 1, '4': 1, '5': 9, '10': 'characteristicId'},
     const {'1': 'properties', '3': 2, '4': 3, '5': 14, '6': '.CharacteristicProperties', '10': 'properties'},
     const {'1': 'serviceId', '3': 3, '4': 1, '5': 9, '10': 'serviceId'},
+    const {'1': 'deviceId', '3': 4, '4': 1, '5': 9, '10': 'deviceId'},
   ],
 };
 
 /// Descriptor for `Characteristic`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List characteristicDescriptor = $convert.base64Decode('Cg5DaGFyYWN0ZXJpc3RpYxIqChBjaGFyYWN0ZXJpc3RpY0lkGAEgASgJUhBjaGFyYWN0ZXJpc3RpY0lkEjkKCnByb3BlcnRpZXMYAiADKA4yGS5DaGFyYWN0ZXJpc3RpY1Byb3BlcnRpZXNSCnByb3BlcnRpZXMSHAoJc2VydmljZUlkGAMgASgJUglzZXJ2aWNlSWQ=');
+final $typed_data.Uint8List characteristicDescriptor = $convert.base64Decode('Cg5DaGFyYWN0ZXJpc3RpYxIqChBjaGFyYWN0ZXJpc3RpY0lkGAEgASgJUhBjaGFyYWN0ZXJpc3RpY0lkEjkKCnByb3BlcnRpZXMYAiADKA4yGS5DaGFyYWN0ZXJpc3RpY1Byb3BlcnRpZXNSCnByb3BlcnRpZXMSHAoJc2VydmljZUlkGAMgASgJUglzZXJ2aWNlSWQSGgoIZGV2aWNlSWQYBCABKAlSCGRldmljZUlk');
 @$core.Deprecated('Use characteristicValueDescriptor instead')
 const CharacteristicValue$json = const {
   '1': 'CharacteristicValue',

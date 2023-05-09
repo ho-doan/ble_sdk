@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -17,10 +18,7 @@ import androidx.core.app.ActivityCompat
 import com.hodoan.ble_sdk.ProtobufModel.*
 import com.hodoan.ble_sdk.ble.BleClient
 import com.hodoan.ble_sdk.ble.IBleClientCallBack
-import com.hodoan.ble_sdk.channel.CharacteristicChannel
-import com.hodoan.ble_sdk.channel.CheckBondedChannel
-import com.hodoan.ble_sdk.channel.ConnectChannel
-import com.hodoan.ble_sdk.channel.DiscoveredServicesChannel
+import com.hodoan.ble_sdk.channel.*
 import com.hodoan.ble_sdk.event.*
 import com.hodoan.ble_sdk.utils.DetectCharProperties
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -31,9 +29,11 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener
 
 /** BleSdkPlugin */
-class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, ActivityAware {
+class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, ActivityAware,
+    RequestPermissionsResultListener {
     private lateinit var channel: MethodChannel
     private lateinit var activity: Activity
     private lateinit var context: Context
@@ -49,6 +49,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     private val checkBondedChannel = CheckBondedChannel()
     private val discoveredServicesChannel = DiscoveredServicesChannel()
     private val connectChannel = ConnectChannel()
+    private val permissionChannel = PermissionChannel()
 
     private var devices: List<BluetoothBLEModel> = listOf()
 
@@ -85,6 +86,10 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
 
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
+            "turnOnBluetooth" -> turnOnBluetooth(result)
+            "requestPermission" -> requestPermission(result)
+            "requestPermissionSettings" -> requestPermissionSettings(result)
+            "checkPermission" -> checkPermission(result)
             "startScan" -> startScan(call, result)
             "stopScan" -> stopScan(result)
             "discoverServices" -> discoverServices(result)
@@ -103,6 +108,34 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     }
 
     //#region onMethodCall
+    private fun turnOnBluetooth(result: Result) {
+        val intentOpenBluetoothSettings = Intent()
+        intentOpenBluetoothSettings.action = Settings.ACTION_BLUETOOTH_SETTINGS
+        activity.startActivity(intentOpenBluetoothSettings)
+        result.success(null)
+    }
+
+    private fun requestPermission(result: Result) {
+        permissionChannel.createRequest(result)
+        requestPermission()
+    }
+
+    private fun requestPermissionSettings(result: Result) {
+        val i = Intent()
+        i.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        i.addCategory(Intent.CATEGORY_DEFAULT)
+        i.data = Uri.parse("package:" + context.packageName)
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+        i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+        activity.startActivity(i)
+        result.success(null)
+    }
+
+    private fun checkPermission(result: Result) {
+        result.success(checkPermissionConnect() && checkPermissionScan())
+    }
+
     private fun startScan(call: MethodCall, result: Result) {
         devices = listOf()
         val scanModel = ScanModel.parseFrom(call.arguments as ByteArray)
@@ -298,13 +331,13 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     }
 
     override fun onConnectionStateChange(state: StateConnect) {
-        if (state == StateConnect.CONNECTED) {
+        if (state == StateConnect.connected) {
             connectChannel.closeRequest(true)
         }
         stateConnectEvent.success(state)
     }
 
-    override fun onServicesDiscovered(services: List<BluetoothGattService>) {
+    override fun onServicesDiscovered(services: List<BluetoothGattService>, deviceId: String) {
         val model = Services.newBuilder()
         model.addAllServices(services.map { service ->
             Service.newBuilder().setServiceId(service.uuid.toString())
@@ -312,6 +345,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
                     Characteristic.newBuilder()
                         .setCharacteristicId(it.uuid.toString())
                         .setServiceId(service.uuid.toString())
+                        .setDeviceId(deviceId)
                         .addAllProperties(DetectCharProperties.detect(it.properties))
                         .build()
                 }).build()
@@ -350,9 +384,10 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     }
     //#endregion
 
-    //#region override activity aware
+    //#region override activity aware, onRequestPermissionsResult
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
+        binding.addRequestPermissionsResultListener(this)
         requestPermission()
     }
 
@@ -361,7 +396,18 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
     override fun onDetachedFromActivity() {
-        bleClient?.dispose()
+        bleClient.dispose()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ): Boolean {
+        val result = requestCode == 111 && !grantResults.toList()
+            .any { it != PackageManager.PERMISSION_GRANTED }
+        permissionChannel.closeRequest(result)
+        return result
     }
     //#endregion
 }

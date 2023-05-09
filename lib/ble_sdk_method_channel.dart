@@ -89,6 +89,27 @@ class MethodChannelBleSdk extends BleSdkPlatform {
   Future<bool> isBluetoothAvailable() => methodChannel
       .invokeMethod<bool>('isBluetoothAvailable')
       .then((value) => value ?? false);
+
+  @override
+  Future<PermissionResult> checkPermission() => methodChannel
+      .invokeMethod<int>('checkPermission')
+      .then((value) => value != null
+          ? PermissionResult.values[value]
+          : PermissionResult.notGranted);
+
+  @override
+  Future<bool> requestPermission() => methodChannel
+      .invokeMethod<bool>('requestPermission')
+      .then((value) => value ?? false);
+
+  @override
+  Future<void> requestPermissionSettings() =>
+      methodChannel.invokeMethod<void>('requestPermissionSettings');
+
+  @override
+  Future<void> turnOnBluetooth() =>
+      methodChannel.invokeMethod<void>('turnOnBluetooth');
+
   @override
   Stream<BluetoothBLEModel> deviceResult() => deviceChannel
       .receiveBroadcastStream()

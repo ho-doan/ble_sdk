@@ -354,6 +354,7 @@ class Characteristic extends $pb.GeneratedMessage {
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characteristicId', protoName: 'characteristicId')
     ..pc<CharacteristicProperties>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties', $pb.PbFieldType.KE, valueOf: CharacteristicProperties.valueOf, enumValues: CharacteristicProperties.values, defaultEnumValue: CharacteristicProperties.NONE)
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceId', protoName: 'serviceId')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'deviceId', protoName: 'deviceId')
     ..hasRequiredFields = false
   ;
 
@@ -362,6 +363,7 @@ class Characteristic extends $pb.GeneratedMessage {
     $core.String? characteristicId,
     $core.Iterable<CharacteristicProperties>? properties,
     $core.String? serviceId,
+    $core.String? deviceId,
   }) {
     final _result = create();
     if (characteristicId != null) {
@@ -372,6 +374,9 @@ class Characteristic extends $pb.GeneratedMessage {
     }
     if (serviceId != null) {
       _result.serviceId = serviceId;
+    }
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
     }
     return _result;
   }
@@ -416,6 +421,15 @@ class Characteristic extends $pb.GeneratedMessage {
   $core.bool hasServiceId() => $_has(2);
   @$pb.TagNumber(3)
   void clearServiceId() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get deviceId => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set deviceId($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasDeviceId() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearDeviceId() => clearField(4);
 }
 
 class CharacteristicValue extends $pb.GeneratedMessage {

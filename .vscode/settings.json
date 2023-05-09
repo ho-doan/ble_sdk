@@ -1,5 +1,5 @@
 {
-  "cSpell.words": ["protobuf", "pbenum", "blesdk"],
+  "cSpell.words": ["protobuf", "pbenum", "blesdk", "pbserver"],
   "cSpell.ignorePaths": [
     "package-lock.json",
     "node_modules",
@@ -7,6 +7,6 @@
     ".git/objects",
     ".vscode",
     ".vscode-insiders",
-    "**.pb**.dart",
+    "**.pb**.dart"
   ]
 }

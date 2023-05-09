@@ -63,6 +63,23 @@ abstract class BleSdkPlatform extends PlatformInterface {
   Future<bool> unBonded(ConnectModel model) =>
       throw UnimplementedError('unBonded() has not been implemented.');
 
+  Future<PermissionResult> checkPermission() async {
+    throw UnimplementedError('checkPermission() has not been implemented.');
+  }
+
+  Future<bool> requestPermission() async {
+    throw UnimplementedError('requestPermission() has not been implemented.');
+  }
+
+  Future<void> requestPermissionSettings() async {
+    throw UnimplementedError(
+        'requestPermissionSettings() has not been implemented.');
+  }
+
+  Future<void> turnOnBluetooth() async {
+    throw UnimplementedError('turnOnBluetooth() has not been implemented.');
+  }
+
   Future<bool> isBluetoothAvailable() => throw UnimplementedError(
       'isBluetoothAvailable() has not been implemented.');
 

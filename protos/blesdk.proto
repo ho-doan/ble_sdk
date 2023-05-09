@@ -41,6 +41,7 @@ message Characteristic{
     // public static final int PROPERTY_WRITE_NO_RESPONSE = 4;
     repeated CharacteristicProperties properties = 2;
     string serviceId = 3;
+    string deviceId = 4;
 }
 
 message CharacteristicValue {
@@ -49,10 +50,17 @@ message CharacteristicValue {
 }
 
 enum StateConnect {
-    CONNECTING = 0;
-    CONNECTED = 1;
-    DISCONNECTING = 2;
-    DISCONNECTED = 3;
+    unKnow = 0;
+    connecting = 1;
+    connected = 2;
+    disconnecting = 3;
+    disconnected = 4;
+}
+
+enum PermissionResult{
+    granted = 0;
+    notGranted = 1;
+    denied = 2;
 }
 
 enum CharacteristicProperties {
@@ -66,9 +74,9 @@ enum CharacteristicProperties {
 }
 
 enum StateBluetooth {
-    TURING_ON = 0;
-    ON = 1;
-    TURING_OFF = 2;
-    OFF = 3;
-    NOT_SUPPORT = 4;
+    turningOn = 0;
+    on = 1;
+    turningOff = 2;
+    off = 3;
+    notSupport = 4;
 }

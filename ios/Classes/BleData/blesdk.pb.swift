@@ -22,32 +22,35 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 
 enum StateConnect: SwiftProtobuf.Enum {
   typealias RawValue = Int
-  case connecting // = 0
-  case connected // = 1
-  case disconnecting // = 2
-  case disconnected // = 3
+  case unKnow // = 0
+  case connecting // = 1
+  case connected // = 2
+  case disconnecting // = 3
+  case disconnected // = 4
   case UNRECOGNIZED(Int)
 
   init() {
-    self = .connecting
+    self = .unKnow
   }
 
   init?(rawValue: Int) {
     switch rawValue {
-    case 0: self = .connecting
-    case 1: self = .connected
-    case 2: self = .disconnecting
-    case 3: self = .disconnected
+    case 0: self = .unKnow
+    case 1: self = .connecting
+    case 2: self = .connected
+    case 3: self = .disconnecting
+    case 4: self = .disconnected
     default: self = .UNRECOGNIZED(rawValue)
     }
   }
 
   var rawValue: Int {
     switch self {
-    case .connecting: return 0
-    case .connected: return 1
-    case .disconnecting: return 2
-    case .disconnected: return 3
+    case .unKnow: return 0
+    case .connecting: return 1
+    case .connected: return 2
+    case .disconnecting: return 3
+    case .disconnected: return 4
     case .UNRECOGNIZED(let i): return i
     }
   }
@@ -59,10 +62,55 @@ enum StateConnect: SwiftProtobuf.Enum {
 extension StateConnect: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
   static var allCases: [StateConnect] = [
+    .unKnow,
     .connecting,
     .connected,
     .disconnecting,
     .disconnected,
+  ]
+}
+
+#endif  // swift(>=4.2)
+
+enum PermissionResult: SwiftProtobuf.Enum {
+  typealias RawValue = Int
+  case granted // = 0
+  case notGranted // = 1
+  case denied // = 2
+  case UNRECOGNIZED(Int)
+
+  init() {
+    self = .granted
+  }
+
+  init?(rawValue: Int) {
+    switch rawValue {
+    case 0: self = .granted
+    case 1: self = .notGranted
+    case 2: self = .denied
+    default: self = .UNRECOGNIZED(rawValue)
+    }
+  }
+
+  var rawValue: Int {
+    switch self {
+    case .granted: return 0
+    case .notGranted: return 1
+    case .denied: return 2
+    case .UNRECOGNIZED(let i): return i
+    }
+  }
+
+}
+
+#if swift(>=4.2)
+
+extension PermissionResult: CaseIterable {
+  // The compiler won't synthesize support with the UNRECOGNIZED case.
+  static var allCases: [PermissionResult] = [
+    .granted,
+    .notGranted,
+    .denied,
   ]
 }
 
@@ -130,22 +178,22 @@ extension CharacteristicProperties: CaseIterable {
 
 enum StateBluetooth: SwiftProtobuf.Enum {
   typealias RawValue = Int
-  case turingOn // = 0
+  case turningOn // = 0
   case on // = 1
-  case turingOff // = 2
+  case turningOff // = 2
   case off // = 3
   case notSupport // = 4
   case UNRECOGNIZED(Int)
 
   init() {
-    self = .turingOn
+    self = .turningOn
   }
 
   init?(rawValue: Int) {
     switch rawValue {
-    case 0: self = .turingOn
+    case 0: self = .turningOn
     case 1: self = .on
-    case 2: self = .turingOff
+    case 2: self = .turningOff
     case 3: self = .off
     case 4: self = .notSupport
     default: self = .UNRECOGNIZED(rawValue)
@@ -154,9 +202,9 @@ enum StateBluetooth: SwiftProtobuf.Enum {
 
   var rawValue: Int {
     switch self {
-    case .turingOn: return 0
+    case .turningOn: return 0
     case .on: return 1
-    case .turingOff: return 2
+    case .turningOff: return 2
     case .off: return 3
     case .notSupport: return 4
     case .UNRECOGNIZED(let i): return i
@@ -170,9 +218,9 @@ enum StateBluetooth: SwiftProtobuf.Enum {
 extension StateBluetooth: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
   static var allCases: [StateBluetooth] = [
-    .turingOn,
+    .turningOn,
     .on,
-    .turingOff,
+    .turningOff,
     .off,
     .notSupport,
   ]
@@ -289,6 +337,8 @@ struct Characteristic {
 
   var serviceID: String = String()
 
+  var deviceID: String = String()
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -319,6 +369,7 @@ struct CharacteristicValue {
 
 #if swift(>=5.5) && canImport(_Concurrency)
 extension StateConnect: @unchecked Sendable {}
+extension PermissionResult: @unchecked Sendable {}
 extension CharacteristicProperties: @unchecked Sendable {}
 extension StateBluetooth: @unchecked Sendable {}
 extension ScanModel: @unchecked Sendable {}
@@ -335,10 +386,19 @@ extension CharacteristicValue: @unchecked Sendable {}
 
 extension StateConnect: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    0: .same(proto: "CONNECTING"),
-    1: .same(proto: "CONNECTED"),
-    2: .same(proto: "DISCONNECTING"),
-    3: .same(proto: "DISCONNECTED"),
+    0: .same(proto: "unKnow"),
+    1: .same(proto: "connecting"),
+    2: .same(proto: "connected"),
+    3: .same(proto: "disconnecting"),
+    4: .same(proto: "disconnected"),
+  ]
+}
+
+extension PermissionResult: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "granted"),
+    1: .same(proto: "notGranted"),
+    2: .same(proto: "denied"),
   ]
 }
 
@@ -356,11 +416,11 @@ extension CharacteristicProperties: SwiftProtobuf._ProtoNameProviding {
 
 extension StateBluetooth: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    0: .same(proto: "TURING_ON"),
-    1: .same(proto: "ON"),
-    2: .same(proto: "TURING_OFF"),
-    3: .same(proto: "OFF"),
-    4: .same(proto: "NOT_SUPPORT"),
+    0: .same(proto: "turningOn"),
+    1: .same(proto: "on"),
+    2: .same(proto: "turningOff"),
+    3: .same(proto: "off"),
+    4: .same(proto: "notSupport"),
   ]
 }
 
@@ -596,6 +656,7 @@ extension Characteristic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
     1: .same(proto: "characteristicId"),
     2: .same(proto: "properties"),
     3: .same(proto: "serviceId"),
+    4: .same(proto: "deviceId"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -607,6 +668,7 @@ extension Characteristic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
       case 1: try { try decoder.decodeSingularStringField(value: &self.characteristicID) }()
       case 2: try { try decoder.decodeRepeatedEnumField(value: &self.properties) }()
       case 3: try { try decoder.decodeSingularStringField(value: &self.serviceID) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.deviceID) }()
       default: break
       }
     }
@@ -622,6 +684,9 @@ extension Characteristic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
     if !self.serviceID.isEmpty {
       try visitor.visitSingularStringField(value: self.serviceID, fieldNumber: 3)
     }
+    if !self.deviceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 4)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -629,6 +694,7 @@ extension Characteristic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
     if lhs.characteristicID != rhs.characteristicID {return false}
     if lhs.properties != rhs.properties {return false}
     if lhs.serviceID != rhs.serviceID {return false}
+    if lhs.deviceID != rhs.deviceID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

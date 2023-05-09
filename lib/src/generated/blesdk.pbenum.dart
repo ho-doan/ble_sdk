@@ -10,22 +10,41 @@ import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class StateConnect extends $pb.ProtobufEnum {
-  static const StateConnect CONNECTING = StateConnect._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'CONNECTING');
-  static const StateConnect CONNECTED = StateConnect._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'CONNECTED');
-  static const StateConnect DISCONNECTING = StateConnect._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'DISCONNECTING');
-  static const StateConnect DISCONNECTED = StateConnect._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'DISCONNECTED');
+  static const StateConnect unKnow = StateConnect._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'unKnow');
+  static const StateConnect connecting = StateConnect._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'connecting');
+  static const StateConnect connected = StateConnect._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'connected');
+  static const StateConnect disconnecting = StateConnect._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'disconnecting');
+  static const StateConnect disconnected = StateConnect._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'disconnected');
 
   static const $core.List<StateConnect> values = <StateConnect> [
-    CONNECTING,
-    CONNECTED,
-    DISCONNECTING,
-    DISCONNECTED,
+    unKnow,
+    connecting,
+    connected,
+    disconnecting,
+    disconnected,
   ];
 
   static final $core.Map<$core.int, StateConnect> _byValue = $pb.ProtobufEnum.initByValue(values);
   static StateConnect? valueOf($core.int value) => _byValue[value];
 
   const StateConnect._($core.int v, $core.String n) : super(v, n);
+}
+
+class PermissionResult extends $pb.ProtobufEnum {
+  static const PermissionResult granted = PermissionResult._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'granted');
+  static const PermissionResult notGranted = PermissionResult._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'notGranted');
+  static const PermissionResult denied = PermissionResult._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'denied');
+
+  static const $core.List<PermissionResult> values = <PermissionResult> [
+    granted,
+    notGranted,
+    denied,
+  ];
+
+  static final $core.Map<$core.int, PermissionResult> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static PermissionResult? valueOf($core.int value) => _byValue[value];
+
+  const PermissionResult._($core.int v, $core.String n) : super(v, n);
 }
 
 class CharacteristicProperties extends $pb.ProtobufEnum {
@@ -54,18 +73,18 @@ class CharacteristicProperties extends $pb.ProtobufEnum {
 }
 
 class StateBluetooth extends $pb.ProtobufEnum {
-  static const StateBluetooth TURING_ON = StateBluetooth._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'TURING_ON');
-  static const StateBluetooth ON = StateBluetooth._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ON');
-  static const StateBluetooth TURING_OFF = StateBluetooth._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'TURING_OFF');
-  static const StateBluetooth OFF = StateBluetooth._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OFF');
-  static const StateBluetooth NOT_SUPPORT = StateBluetooth._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'NOT_SUPPORT');
+  static const StateBluetooth turningOn = StateBluetooth._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'turningOn');
+  static const StateBluetooth on = StateBluetooth._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'on');
+  static const StateBluetooth turningOff = StateBluetooth._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'turningOff');
+  static const StateBluetooth off = StateBluetooth._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'off');
+  static const StateBluetooth notSupport = StateBluetooth._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'notSupport');
 
   static const $core.List<StateBluetooth> values = <StateBluetooth> [
-    TURING_ON,
-    ON,
-    TURING_OFF,
-    OFF,
-    NOT_SUPPORT,
+    turningOn,
+    on,
+    turningOff,
+    off,
+    notSupport,
   ];
 
   static final $core.Map<$core.int, StateBluetooth> _byValue = $pb.ProtobufEnum.initByValue(values);

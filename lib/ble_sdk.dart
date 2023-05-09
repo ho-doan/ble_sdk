@@ -18,8 +18,16 @@ abstract class BleSdkNative {
   Future<List<Service>> discoverServices() =>
       BleSdkPlatform.instance.discoverServices();
 
-  Future<bool> connect({required String deviceId}) =>
-      BleSdkPlatform.instance.connect(ConnectModel(deviceId: deviceId));
+  Future<bool> connect({
+    required String deviceId,
+    bool createBond = false,
+  }) =>
+      BleSdkPlatform.instance.connect(
+        ConnectModel(
+          deviceId: deviceId,
+          createBonded: createBond,
+        ),
+      );
 
   Future<bool> disconnect() => BleSdkPlatform.instance.disconnect();
 
@@ -46,6 +54,17 @@ abstract class BleSdkNative {
 
   Future<bool> isBluetoothAvailable() =>
       BleSdkPlatform.instance.isBluetoothAvailable();
+
+  Future<PermissionResult> checkPermission() =>
+      BleSdkPlatform.instance.checkPermission();
+
+  Future<bool> requestPermission() =>
+      BleSdkPlatform.instance.requestPermission();
+
+  Future<void> turnOnBluetooth() => BleSdkPlatform.instance.turnOnBluetooth();
+
+  Future<void> requestPermissionSettings() =>
+      BleSdkPlatform.instance.requestPermissionSettings();
 
   Stream<BluetoothBLEModel> get deviceResult =>
       BleSdkPlatform.instance.deviceResult();
