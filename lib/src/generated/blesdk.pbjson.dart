@@ -8,6 +8,7 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
+
 @$core.Deprecated('Use stateConnectDescriptor instead')
 const StateConnect$json = const {
   '1': 'StateConnect',
@@ -21,7 +22,8 @@ const StateConnect$json = const {
 };
 
 /// Descriptor for `StateConnect`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List stateConnectDescriptor = $convert.base64Decode('CgxTdGF0ZUNvbm5lY3QSCgoGdW5Lbm93EAASDgoKY29ubmVjdGluZxABEg0KCWNvbm5lY3RlZBACEhEKDWRpc2Nvbm5lY3RpbmcQAxIQCgxkaXNjb25uZWN0ZWQQBA==');
+final $typed_data.Uint8List stateConnectDescriptor = $convert.base64Decode(
+    'CgxTdGF0ZUNvbm5lY3QSCgoGdW5Lbm93EAASDgoKY29ubmVjdGluZxABEg0KCWNvbm5lY3RlZBACEhEKDWRpc2Nvbm5lY3RpbmcQAxIQCgxkaXNjb25uZWN0ZWQQBA==');
 @$core.Deprecated('Use permissionResultDescriptor instead')
 const PermissionResult$json = const {
   '1': 'PermissionResult',
@@ -33,7 +35,8 @@ const PermissionResult$json = const {
 };
 
 /// Descriptor for `PermissionResult`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List permissionResultDescriptor = $convert.base64Decode('ChBQZXJtaXNzaW9uUmVzdWx0EgsKB2dyYW50ZWQQABIOCgpub3RHcmFudGVkEAESCgoGZGVuaWVkEAI=');
+final $typed_data.Uint8List permissionResultDescriptor = $convert.base64Decode(
+    'ChBQZXJtaXNzaW9uUmVzdWx0EgsKB2dyYW50ZWQQABIOCgpub3RHcmFudGVkEAESCgoGZGVuaWVkEAI=');
 @$core.Deprecated('Use characteristicPropertiesDescriptor instead')
 const CharacteristicProperties$json = const {
   '1': 'CharacteristicProperties',
@@ -49,7 +52,9 @@ const CharacteristicProperties$json = const {
 };
 
 /// Descriptor for `CharacteristicProperties`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List characteristicPropertiesDescriptor = $convert.base64Decode('ChhDaGFyYWN0ZXJpc3RpY1Byb3BlcnRpZXMSCAoETk9ORRAAEggKBFJFQUQQAhIVChFXUklURV9OT19SRVNQT05TRRAEEgkKBVdSSVRFEAgSCgoGTk9USUZZEBASDAoISU5ESUNBVEUQIBIQCgxTSUdORURfV1JJVEUQQA==');
+final $typed_data.Uint8List characteristicPropertiesDescriptor =
+    $convert.base64Decode(
+        'ChhDaGFyYWN0ZXJpc3RpY1Byb3BlcnRpZXMSCAoETk9ORRAAEggKBFJFQUQQAhIVChFXUklURV9OT19SRVNQT05TRRAEEgkKBVdSSVRFEAgSCgoGTk9USUZZEBASDAoISU5ESUNBVEUQIBIQCgxTSUdORURfV1JJVEUQQA==');
 @$core.Deprecated('Use stateBluetoothDescriptor instead')
 const StateBluetooth$json = const {
   '1': 'StateBluetooth',
@@ -63,7 +68,8 @@ const StateBluetooth$json = const {
 };
 
 /// Descriptor for `StateBluetooth`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List stateBluetoothDescriptor = $convert.base64Decode('Cg5TdGF0ZUJsdWV0b290aBINCgl0dXJuaW5nT24QABIGCgJvbhABEg4KCnR1cm5pbmdPZmYQAhIHCgNvZmYQAxIOCgpub3RTdXBwb3J0EAQ=');
+final $typed_data.Uint8List stateBluetoothDescriptor = $convert.base64Decode(
+    'Cg5TdGF0ZUJsdWV0b290aBINCgl0dXJuaW5nT24QABIGCgJvbhABEg4KCnR1cm5pbmdPZmYQAhIHCgNvZmYQAxIOCgpub3RTdXBwb3J0EAQ=');
 @$core.Deprecated('Use scanModelDescriptor instead')
 const ScanModel$json = const {
   '1': 'ScanModel',
@@ -73,7 +79,8 @@ const ScanModel$json = const {
 };
 
 /// Descriptor for `ScanModel`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List scanModelDescriptor = $convert.base64Decode('CglTY2FuTW9kZWwSGgoIc2VydmljZXMYASADKAlSCHNlcnZpY2Vz');
+final $typed_data.Uint8List scanModelDescriptor = $convert
+    .base64Decode('CglTY2FuTW9kZWwSGgoIc2VydmljZXMYASADKAlSCHNlcnZpY2Vz');
 @$core.Deprecated('Use connectModelDescriptor instead')
 const ConnectModel$json = const {
   '1': 'ConnectModel',
@@ -84,7 +91,8 @@ const ConnectModel$json = const {
 };
 
 /// Descriptor for `ConnectModel`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List connectModelDescriptor = $convert.base64Decode('CgxDb25uZWN0TW9kZWwSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZUlkEiIKDGNyZWF0ZUJvbmRlZBgCIAEoCFIMY3JlYXRlQm9uZGVk');
+final $typed_data.Uint8List connectModelDescriptor = $convert.base64Decode(
+    'CgxDb25uZWN0TW9kZWwSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZUlkEiIKDGNyZWF0ZUJvbmRlZBgCIAEoCFIMY3JlYXRlQm9uZGVk');
 @$core.Deprecated('Use bluetoothBLEModelDescriptor instead')
 const BluetoothBLEModel$json = const {
   '1': 'BluetoothBLEModel',
@@ -96,57 +104,103 @@ const BluetoothBLEModel$json = const {
 };
 
 /// Descriptor for `BluetoothBLEModel`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List bluetoothBLEModelDescriptor = $convert.base64Decode('ChFCbHVldG9vdGhCTEVNb2RlbBIOCgJpZBgBIAEoCVICaWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIWCgZib25kZWQYAyABKAhSBmJvbmRlZA==');
+final $typed_data.Uint8List bluetoothBLEModelDescriptor = $convert.base64Decode(
+    'ChFCbHVldG9vdGhCTEVNb2RlbBIOCgJpZBgBIAEoCVICaWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIWCgZib25kZWQYAyABKAhSBmJvbmRlZA==');
 @$core.Deprecated('Use logDescriptor instead')
 const Log$json = const {
   '1': 'Log',
   '2': const [
     const {'1': 'message', '3': 1, '4': 1, '5': 9, '10': 'message'},
-    const {'1': 'characteristic', '3': 2, '4': 1, '5': 11, '6': '.Characteristic', '10': 'characteristic'},
+    const {
+      '1': 'characteristic',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.Characteristic',
+      '10': 'characteristic'
+    },
   ],
 };
 
 /// Descriptor for `Log`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List logDescriptor = $convert.base64Decode('CgNMb2cSGAoHbWVzc2FnZRgBIAEoCVIHbWVzc2FnZRI3Cg5jaGFyYWN0ZXJpc3RpYxgCIAEoCzIPLkNoYXJhY3RlcmlzdGljUg5jaGFyYWN0ZXJpc3RpYw==');
+final $typed_data.Uint8List logDescriptor = $convert.base64Decode(
+    'CgNMb2cSGAoHbWVzc2FnZRgBIAEoCVIHbWVzc2FnZRI3Cg5jaGFyYWN0ZXJpc3RpYxgCIAEoCzIPLkNoYXJhY3RlcmlzdGljUg5jaGFyYWN0ZXJpc3RpYw==');
 @$core.Deprecated('Use serviceDescriptor instead')
 const Service$json = const {
   '1': 'Service',
   '2': const [
     const {'1': 'serviceId', '3': 1, '4': 1, '5': 9, '10': 'serviceId'},
-    const {'1': 'characteristics', '3': 2, '4': 3, '5': 11, '6': '.Characteristic', '10': 'characteristics'},
+    const {
+      '1': 'characteristics',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.Characteristic',
+      '10': 'characteristics'
+    },
   ],
 };
 
 /// Descriptor for `Service`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List serviceDescriptor = $convert.base64Decode('CgdTZXJ2aWNlEhwKCXNlcnZpY2VJZBgBIAEoCVIJc2VydmljZUlkEjkKD2NoYXJhY3RlcmlzdGljcxgCIAMoCzIPLkNoYXJhY3RlcmlzdGljUg9jaGFyYWN0ZXJpc3RpY3M=');
+final $typed_data.Uint8List serviceDescriptor = $convert.base64Decode(
+    'CgdTZXJ2aWNlEhwKCXNlcnZpY2VJZBgBIAEoCVIJc2VydmljZUlkEjkKD2NoYXJhY3RlcmlzdGljcxgCIAMoCzIPLkNoYXJhY3RlcmlzdGljUg9jaGFyYWN0ZXJpc3RpY3M=');
 @$core.Deprecated('Use servicesDescriptor instead')
 const Services$json = const {
   '1': 'Services',
   '2': const [
-    const {'1': 'services', '3': 1, '4': 3, '5': 11, '6': '.Service', '10': 'services'},
+    const {
+      '1': 'services',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.Service',
+      '10': 'services'
+    },
   ],
 };
 
 /// Descriptor for `Services`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List servicesDescriptor = $convert.base64Decode('CghTZXJ2aWNlcxIkCghzZXJ2aWNlcxgBIAMoCzIILlNlcnZpY2VSCHNlcnZpY2Vz');
+final $typed_data.Uint8List servicesDescriptor = $convert.base64Decode(
+    'CghTZXJ2aWNlcxIkCghzZXJ2aWNlcxgBIAMoCzIILlNlcnZpY2VSCHNlcnZpY2Vz');
 @$core.Deprecated('Use characteristicDescriptor instead')
 const Characteristic$json = const {
   '1': 'Characteristic',
   '2': const [
-    const {'1': 'characteristicId', '3': 1, '4': 1, '5': 9, '10': 'characteristicId'},
-    const {'1': 'properties', '3': 2, '4': 3, '5': 14, '6': '.CharacteristicProperties', '10': 'properties'},
+    const {
+      '1': 'characteristicId',
+      '3': 1,
+      '4': 1,
+      '5': 9,
+      '10': 'characteristicId'
+    },
+    const {
+      '1': 'properties',
+      '3': 2,
+      '4': 3,
+      '5': 14,
+      '6': '.CharacteristicProperties',
+      '10': 'properties'
+    },
     const {'1': 'serviceId', '3': 3, '4': 1, '5': 9, '10': 'serviceId'},
     const {'1': 'deviceId', '3': 4, '4': 1, '5': 9, '10': 'deviceId'},
   ],
 };
 
 /// Descriptor for `Characteristic`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List characteristicDescriptor = $convert.base64Decode('Cg5DaGFyYWN0ZXJpc3RpYxIqChBjaGFyYWN0ZXJpc3RpY0lkGAEgASgJUhBjaGFyYWN0ZXJpc3RpY0lkEjkKCnByb3BlcnRpZXMYAiADKA4yGS5DaGFyYWN0ZXJpc3RpY1Byb3BlcnRpZXNSCnByb3BlcnRpZXMSHAoJc2VydmljZUlkGAMgASgJUglzZXJ2aWNlSWQSGgoIZGV2aWNlSWQYBCABKAlSCGRldmljZUlk');
+final $typed_data.Uint8List characteristicDescriptor = $convert.base64Decode(
+    'Cg5DaGFyYWN0ZXJpc3RpYxIqChBjaGFyYWN0ZXJpc3RpY0lkGAEgASgJUhBjaGFyYWN0ZXJpc3RpY0lkEjkKCnByb3BlcnRpZXMYAiADKA4yGS5DaGFyYWN0ZXJpc3RpY1Byb3BlcnRpZXNSCnByb3BlcnRpZXMSHAoJc2VydmljZUlkGAMgASgJUglzZXJ2aWNlSWQSGgoIZGV2aWNlSWQYBCABKAlSCGRldmljZUlk');
 @$core.Deprecated('Use characteristicValueDescriptor instead')
 const CharacteristicValue$json = const {
   '1': 'CharacteristicValue',
   '2': const [
-    const {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.Characteristic', '10': 'characteristic'},
+    const {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.Characteristic',
+      '10': 'characteristic'
+    },
     const {
       '1': 'data',
       '3': 2,
@@ -159,4 +213,5 @@ const CharacteristicValue$json = const {
 };
 
 /// Descriptor for `CharacteristicValue`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List characteristicValueDescriptor = $convert.base64Decode('ChNDaGFyYWN0ZXJpc3RpY1ZhbHVlEjcKDmNoYXJhY3RlcmlzdGljGAEgASgLMg8uQ2hhcmFjdGVyaXN0aWNSDmNoYXJhY3RlcmlzdGljEhYKBGRhdGEYAiADKAVCAhABUgRkYXRh');
+final $typed_data.Uint8List characteristicValueDescriptor = $convert.base64Decode(
+    'ChNDaGFyYWN0ZXJpc3RpY1ZhbHVlEjcKDmNoYXJhY3RlcmlzdGljGAEgASgLMg8uQ2hhcmFjdGVyaXN0aWNSDmNoYXJhY3RlcmlzdGljEhYKBGRhdGEYAiADKAVCAhABUgRkYXRh');
