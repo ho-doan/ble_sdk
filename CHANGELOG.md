@@ -12,3 +12,7 @@
 * New func checkPermission
 * New func requestPermission
 * New func requestPermissionSettings
+
+## 0.0.4
+
+* Support IOS
