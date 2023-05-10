@@ -39,6 +39,18 @@ message Characteristic{
     // public static final int PROPERTY_SIGNED_WRITE = 64;
     // public static final int PROPERTY_WRITE = 8;
     // public static final int PROPERTY_WRITE_NO_RESPONSE = 4;
+
+    // for ios
+    // CBCharacteristicPropertyBroadcast												= 0x01,
+	// CBCharacteristicPropertyRead													    = 0x02,
+	// CBCharacteristicPropertyWriteWithoutResponse									    = 0x04,
+	// CBCharacteristicPropertyWrite													= 0x08,
+	// CBCharacteristicPropertyNotify													= 0x10,
+	// CBCharacteristicPropertyIndicate												    = 0x20,
+	// CBCharacteristicPropertyAuthenticatedSignedWrites								= 0x40,
+	// CBCharacteristicPropertyExtendedProperties										= 0x80,
+	// CBCharacteristicPropertyNotifyEncryptionRequired NS_ENUM_AVAILABLE(10_9, 6_0)	= 0x100,
+	// CBCharacteristicPropertyIndicateEncryptionRequired NS_ENUM_AVAILABLE(10_9, 6_0)	= 0x200
     repeated CharacteristicProperties properties = 2;
     string serviceId = 3;
     string deviceId = 4;

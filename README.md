@@ -1,7 +1,10 @@
 # ble_sdk
 
-[![ble_sdk version](https://img.shields.io/pub/v/ble_sdk?label=ble_sdk)](https://pub.dev/packages/ble_sdk)
-Bluetooth Low Energy (BLE) plugin that can communicate with single device
+* [![ble_sdk version](https://img.shields.io/pub/v/ble_sdk?label=ble_sdk)](https://pub.dev/packages/ble_sdk)
+[![ble_sdk size](https://img.shields.io/github/repo-size/ho-doan/ble_sdk)](https://github.com/ho-doan/ble_sdk)
+[![ble_sdk issues](https://img.shields.io/github/issues/ho-doan/ble_sdk)](https://github.com/ho-doan/ble_sdk)
+[![ble_sdk issues](https://img.shields.io/pub/likes/ble_sdk)](https://github.com/ho-doan/ble_sdk)
+* Bluetooth Low Energy (BLE) plugin that can communicate with single device
 
 ## Futures
 

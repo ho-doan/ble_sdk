@@ -1,11 +1,20 @@
 PODS:
   - ble_sdk (0.0.1):
     - Flutter
+    - Protobuf (~> 3.5)
+    - SwiftProtobuf (~> 1.0)
   - Flutter (1.0.0)
+  - Protobuf (3.22.3)
+  - SwiftProtobuf (1.21.0)
 
 DEPENDENCIES:
   - ble_sdk (from `.symlinks/plugins/ble_sdk/ios`)
   - Flutter (from `Flutter`)
+
+SPEC REPOS:
+  trunk:
+    - Protobuf
+    - SwiftProtobuf
 
 EXTERNAL SOURCES:
   ble_sdk:
@@ -14,8 +23,10 @@ EXTERNAL SOURCES:
     :path: Flutter
 
 SPEC CHECKSUMS:
-  ble_sdk: 5edb6e0283997030b90e134a8f838785b86e7d55
+  ble_sdk: ab732126d2587fe23b07752bc99756fc8add7278
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  Protobuf: d03938d5f7e974a97964fb0567771e36fbe9ecce
+  SwiftProtobuf: afced68785854575756db965e9da52bbf3dc45e7
 
 PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
 
