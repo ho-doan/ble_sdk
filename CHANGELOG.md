@@ -1,10 +1,10 @@
-## 0.0.1
+## 0.0.4
 
-* Initial open source release android.
+* Update dart doc comments
 
-## 0.0.2
+## 0.0.4
 
-* Add createBonded func connect android
+* Support IOS
 
 ## 0.0.3
 
@@ -13,6 +13,9 @@
 * New func requestPermission
 * New func requestPermissionSettings
 
-## 0.0.4
+## 0.0.2
 
-* Support IOS
+* Add createBonded func connect android
+## 0.0.1
+
+* Initial open source release android.

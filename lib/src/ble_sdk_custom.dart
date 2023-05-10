@@ -8,8 +8,8 @@ class BleSdk extends BleSdkNative {
     List<Characteristic>? notifications,
     int timeout = 550,
   }) async {
-    // ignore: prefer_final_locals
-    List<CharacteristicValue> values = List<CharacteristicValue>.from([]);
+    List<CharacteristicValue> values;
+    values = [];
 
     final completer = Completer<List<CharacteristicValue>>();
     late StreamSubscription<CharacteristicValue> listen;
