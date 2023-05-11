@@ -36,6 +36,9 @@ class MethodChannelBleSdk extends BleSdkPlatform {
         .then((value) => value ?? false);
     if (!result) return false;
     final bonded = await checkBonded();
+    if (!bonded) {
+      disconnect();
+    }
     return bonded;
   }
 

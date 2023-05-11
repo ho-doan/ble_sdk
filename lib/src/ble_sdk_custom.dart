@@ -6,7 +6,7 @@ class BleSdk extends BleSdkNative {
   Future<List<CharacteristicValue>> writeCharacteristicVsNotify(
     CharacteristicValue value, {
     List<Characteristic>? notifications,
-    int timeout = 550,
+    int timeout = 3550,
   }) async {
     List<CharacteristicValue> values;
     values = [];
@@ -15,15 +15,16 @@ class BleSdk extends BleSdkNative {
     late StreamSubscription<CharacteristicValue> listen;
     Timer? timer;
     listen = characteristicResult.listen((event) {
+      log('data ${event.data}');
       if (timer != null) {
-        timer!.cancel();
+        timer.cancel();
       }
       values.add(event);
-      timer = Timer.periodic(Duration(milliseconds: timeout), (timer) {
-        timer.cancel();
-        listen.cancel();
-        completer.complete(values);
-      });
+      // timer = Timer.periodic(Duration(milliseconds: timeout), (timer) {
+      //   timer.cancel();
+      //   listen.cancel();
+      //   completer.complete(values);
+      // });
     });
     final listNotifications = [
       value.characteristic,
@@ -38,9 +39,19 @@ class BleSdk extends BleSdkNative {
         }
       }),
     );
-    await Future.forEach(listNotifications, (notify) => notify);
-    await Future<void>.delayed(const Duration(milliseconds: 150));
+    final checkNotify = value.characteristic.properties
+            .contains(CharacteristicProperties.NOTIFY) ||
+        value.characteristic.properties
+            .contains(CharacteristicProperties.INDICATE);
+    if (checkNotify) {
+      await Future.forEach(listNotifications, (notify) => notify);
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
     final isWrite = await writeCharacteristicNoResponse(value);
+    if (!checkNotify) {
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      await Future.forEach(listNotifications, (notify) => notify);
+    }
     if (!isWrite) {
       listen.cancel();
       timer?.cancel();

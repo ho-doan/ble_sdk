@@ -1,4 +1,9 @@
-## 0.0.4
+## 0.0.6
+
+* update func connect with bonded failure
+* update func write characteristic with properties NOTIFICATION | INDICATION
+
+## 0.0.5
 
 * Update dart doc comments
 
