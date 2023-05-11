@@ -128,10 +128,12 @@ class MethodChannelBleSdk extends BleSdkPlatform {
   @override
   Stream<Log> logResult() => logsChannel
       .receiveBroadcastStream()
-      .map((event) => Log.fromBuffer(event));
+      .map((event) => Log.fromBuffer(event))
+      .asBroadcastStream();
 
   @override
   Stream<CharacteristicValue> characteristicResult() => characteristicChannel
       .receiveBroadcastStream()
-      .map((event) => CharacteristicValue.fromBuffer(event));
+      .map((event) => CharacteristicValue.fromBuffer(event))
+      .asBroadcastStream();
 }

@@ -136,24 +136,25 @@ class BleClient(
                 value: ByteArray,
                 status: Int
             ) {
-                if (status != BluetoothDevice.BOND_BONDED) {
-                    gatt.device.createBond()
-                }
+//                if (status != BluetoothDevice.BOND_BONDED) {
+//                    gatt.device.createBond()
+//                }
                 callBack.onCharacteristicValue(characteristic, value)
                 super.onCharacteristicRead(gatt, characteristic, value, status)
             }
 
-            @SuppressLint("MissingPermission")
-            @Suppress("DEPRECATION")
-            @Deprecated("Deprecated in Java")
+            //            @Suppress("DEPRECATION")
+//            @Deprecated("Deprecated in Java")
             override fun onCharacteristicRead(
                 gatt: BluetoothGatt?,
                 characteristic: BluetoothGattCharacteristic?,
                 status: Int
             ) {
-                if (status != BluetoothDevice.BOND_BONDED) {
-                    gatt?.device?.createBond()
-                }
+//                @SuppressLint("MissingPermission")
+//                if (status != BluetoothDevice.BOND_BONDED) {
+//                    gatt?.device?.createBond()
+//                }
+                Log.e(TAG, "onCharacteristicRead: $characteristic ${characteristic?.value}")
                 characteristic?.let {
                     callBack.onCharacteristicValue(it, it.value ?: byteArrayOf())
                 }
@@ -169,12 +170,13 @@ class BleClient(
                 super.onCharacteristicChanged(gatt, characteristic, value)
             }
 
-            @Suppress("DEPRECATION")
-            @Deprecated("Deprecated in Java")
+            //            @Suppress("DEPRECATION")
+//            @Deprecated("Deprecated in Java")
             override fun onCharacteristicChanged(
                 gatt: BluetoothGatt?,
                 characteristic: BluetoothGattCharacteristic?
             ) {
+                Log.e(TAG, "onCharacteristicChanged: $characteristic ${characteristic?.value}")
                 characteristic?.let {
                     callBack.onCharacteristicValue(it, it.value)
                 }
@@ -302,7 +304,7 @@ class BleClient(
         val gattCharacteristic = c(service, characteristic.characteristicId) ?: return cNull()
         @SuppressLint("MissingPermission")
         if (callBack.checkPermissionConnect()) {
-            gatt.readCharacteristic(gattCharacteristic)
+            return gatt.readCharacteristic(gattCharacteristic)
         }
         return false
     }
@@ -312,8 +314,11 @@ class BleClient(
         characteristic: CharacteristicValue
     ): Boolean {
         val valueArgs = characteristic.dataList.map { it.toByte() }.toByteArray()
+        Log.e("//", "writeCharacteristicNoResponse gatt: ")
         val gatt = g() ?: return gNull()
+        Log.e("//", "writeCharacteristicNoResponse:ser ")
         val service = s(gatt, characteristic.characteristic.serviceId) ?: return sNull()
+        Log.e("//", "writeCharacteristicNoResponse:char ")
         val gattCharacteristic =
             c(service, characteristic.characteristic.characteristicId) ?: return cNull()
         if (!callBack.checkPermissionConnect()) return false
@@ -350,6 +355,7 @@ class BleClient(
                 }
             }
         } else {
+            Log.e("//", "writeCharacteristicNoResponse:write ")
             @Suppress("DEPRECATION")
             gattCharacteristic.value = valueArgs
             gattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
@@ -365,12 +371,12 @@ class BleClient(
         @SuppressLint("MissingPermission")
         if (callBack.checkPermissionConnect()) {
             if (gatt.setCharacteristicNotification(gattCharacteristic, true)) {
-                Thread.sleep(500L)
+                Thread.sleep(1000L)
                 val descriptor = d(gattCharacteristic) ?: return dNull()
                 return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     when (gatt.writeDescriptor(
                         descriptor,
-                        BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                        BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                     )) {
                         BluetoothStatusCodes.SUCCESS -> true
                         BluetoothStatusCodes.ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION -> {
@@ -403,7 +409,7 @@ class BleClient(
                     }
                 } else {
                     @Suppress("DEPRECATION")
-                    descriptor.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                    descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                     @Suppress("DEPRECATION")
                     gatt.writeDescriptor(descriptor)
                 }
@@ -420,7 +426,7 @@ class BleClient(
         @SuppressLint("MissingPermission")
         if (callBack.checkPermissionConnect()) {
             if (gatt.setCharacteristicNotification(gattCharacteristic, true)) {
-                Thread.sleep(500L)
+                Thread.sleep(1000L)
                 val descriptor = d(gattCharacteristic) ?: return dNull()
                 return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     when (gatt.writeDescriptor(
