@@ -6,7 +6,7 @@ class BleSdk extends BleSdkNative {
   Future<List<CharacteristicValue>> writeCharacteristicVsNotify(
     CharacteristicValue value, {
     List<Characteristic>? notifications,
-    int timeout = 2550,
+    int timeout = 1500,
   }) async {
     List<CharacteristicValue> values;
     values = [];

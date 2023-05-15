@@ -197,9 +197,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
             Log.newBuilder().setCharacteristic(charValue.characteristic)
                 .setMessage("data write " + charValue.dataList.joinToString(", ")).build()
         )
-        android.util.Log.e("//", "writeCharacteristicNoResponse: ")
         val isResult = bleClient.writeCharacteristic(charValue)
-        android.util.Log.e("//", "writeCharacteristicNoResponse: $isResult")
         result.success(isResult)
     }
 

@@ -17,6 +17,7 @@ import com.hodoan.ble_sdk.ProtobufModel
 import com.hodoan.ble_sdk.ProtobufModel.Characteristic
 import com.hodoan.ble_sdk.ProtobufModel.CharacteristicValue
 import com.hodoan.ble_sdk.ProtobufModel.ConnectModel
+import com.hodoan.ble_sdk.ble.utils.EnableNotification
 import com.hodoan.ble_sdk.utils.UuidConvert
 import java.lang.reflect.Method
 
@@ -32,6 +33,12 @@ interface IBleClient {
     fun writeCharacteristic(characteristic: CharacteristicValue): Boolean
     fun notificationCharacteristic(characteristic: Characteristic): Boolean
     fun indicationCharacteristic(characteristic: Characteristic): Boolean
+    fun writeDescriptor(
+        gatt: BluetoothGatt,
+        descriptor: BluetoothGattDescriptor,
+        value: ByteArray
+    ): Boolean
+
     fun unBonded(deviceId: String): Boolean
     fun dispose()
 }
@@ -60,6 +67,7 @@ class BleClient(
     @Suppress("PrivatePropertyName")
     private val TAG = BleClient::class.simpleName
     private val scanner = adapter.bluetoothLeScanner
+    private val enableNotification = EnableNotification()
 
     private var scanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanFailed(errorCode: Int) {
@@ -115,6 +123,7 @@ class BleClient(
                         callBack.onConnectionStateChange(ProtobufModel.StateConnect.disconnecting)
                     }
                     BluetoothProfile.STATE_DISCONNECTED -> {
+                        enableNotification.dispose()
                         isBonded = false
                         gattCurrent = null
                         callBack.onConnectionStateChange(ProtobufModel.StateConnect.disconnected)
@@ -136,25 +145,24 @@ class BleClient(
                 value: ByteArray,
                 status: Int
             ) {
-//                if (status != BluetoothDevice.BOND_BONDED) {
-//                    gatt.device.createBond()
-//                }
+                if (status != BluetoothDevice.BOND_BONDED) {
+                    gatt.device.createBond()
+                }
                 callBack.onCharacteristicValue(characteristic, value)
                 super.onCharacteristicRead(gatt, characteristic, value, status)
             }
 
-            //            @Suppress("DEPRECATION")
-//            @Deprecated("Deprecated in Java")
+            @Suppress("DEPRECATION")
+            @Deprecated("Deprecated in Java")
             override fun onCharacteristicRead(
                 gatt: BluetoothGatt?,
                 characteristic: BluetoothGattCharacteristic?,
                 status: Int
             ) {
-//                @SuppressLint("MissingPermission")
-//                if (status != BluetoothDevice.BOND_BONDED) {
-//                    gatt?.device?.createBond()
-//                }
-                Log.e(TAG, "onCharacteristicRead: $characteristic ${characteristic?.value}")
+                @SuppressLint("MissingPermission")
+                if (status != BluetoothDevice.BOND_BONDED) {
+                    gatt?.device?.createBond()
+                }
                 characteristic?.let {
                     callBack.onCharacteristicValue(it, it.value ?: byteArrayOf())
                 }
@@ -170,13 +178,12 @@ class BleClient(
                 super.onCharacteristicChanged(gatt, characteristic, value)
             }
 
-            //            @Suppress("DEPRECATION")
-//            @Deprecated("Deprecated in Java")
+            @Suppress("DEPRECATION")
+            @Deprecated("Deprecated in Java")
             override fun onCharacteristicChanged(
                 gatt: BluetoothGatt?,
                 characteristic: BluetoothGattCharacteristic?
             ) {
-                Log.e(TAG, "onCharacteristicChanged: $characteristic ${characteristic?.value}")
                 characteristic?.let {
                     callBack.onCharacteristicValue(it, it.value)
                 }
@@ -314,11 +321,8 @@ class BleClient(
         characteristic: CharacteristicValue
     ): Boolean {
         val valueArgs = characteristic.dataList.map { it.toByte() }.toByteArray()
-        Log.e("//", "writeCharacteristicNoResponse gatt: ")
         val gatt = g() ?: return gNull()
-        Log.e("//", "writeCharacteristicNoResponse:ser ")
         val service = s(gatt, characteristic.characteristic.serviceId) ?: return sNull()
-        Log.e("//", "writeCharacteristicNoResponse:char ")
         val gattCharacteristic =
             c(service, characteristic.characteristic.characteristicId) ?: return cNull()
         if (!callBack.checkPermissionConnect()) return false
@@ -355,7 +359,6 @@ class BleClient(
                 }
             }
         } else {
-            Log.e("//", "writeCharacteristicNoResponse:write ")
             @Suppress("DEPRECATION")
             gattCharacteristic.value = valueArgs
             gattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
@@ -364,114 +367,82 @@ class BleClient(
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun notificationCharacteristic(characteristic: Characteristic): Boolean {
         val gatt = g() ?: return gNull()
         val service = s(gatt, characteristic.serviceId) ?: return sNull()
         val gattCharacteristic = c(service, characteristic.characteristicId) ?: return cNull()
-        @SuppressLint("MissingPermission")
-        if (callBack.checkPermissionConnect()) {
-            if (gatt.setCharacteristicNotification(gattCharacteristic, true)) {
-                Thread.sleep(1000L)
-                val descriptor = d(gattCharacteristic) ?: return dNull()
-                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    when (gatt.writeDescriptor(
-                        descriptor,
-                        BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    )) {
-                        BluetoothStatusCodes.SUCCESS -> true
-                        BluetoothStatusCodes.ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION -> {
-                            Log.e(
-                                TAG,
-                                "writeCharacteristicT: ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION"
-                            )
-                            false
-                        }
-                        BluetoothStatusCodes.ERROR_GATT_WRITE_NOT_ALLOWED -> {
-                            Log.e(TAG, "writeCharacteristicT: ERROR_GATT_WRITE_NOT_ALLOWED")
-                            false
-                        }
-                        BluetoothStatusCodes.ERROR_UNKNOWN -> {
-                            Log.e(TAG, "writeCharacteristicT: ERROR_UNKNOWN")
-                            false
-                        }
-                        BluetoothStatusCodes.ERROR_GATT_WRITE_REQUEST_BUSY -> {
-                            Log.e(TAG, "writeCharacteristicT: ERROR_GATT_WRITE_REQUEST_BUSY")
-                            false
-                        }
-                        BluetoothStatusCodes.ERROR_PROFILE_SERVICE_NOT_BOUND -> {
-                            Log.e(TAG, "writeCharacteristicT: ERROR_PROFILE_SERVICE_NOT_BOUND")
-                            false
-                        }
-                        else -> {
-                            Log.e(TAG, "writeCharacteristicT: UnKnown")
-                            false
-                        }
-                    }
-                } else {
-                    @Suppress("DEPRECATION")
-                    descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    @Suppress("DEPRECATION")
-                    gatt.writeDescriptor(descriptor)
-                }
-            }
-            return false
+        if (!callBack.checkPermissionConnect()) return false
+        if (enableNotification.enable(characteristic)) {
+            if (!gatt.setCharacteristicNotification(gattCharacteristic, true))
+                return false
+            else Thread.sleep(1000L)
         }
-        return false
+        val descriptor = d(gattCharacteristic) ?: return dNull()
+        return writeDescriptor(gatt, descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
     }
 
+    @SuppressLint("MissingPermission")
     override fun indicationCharacteristic(characteristic: Characteristic): Boolean {
         val gatt = g() ?: return gNull()
         val service = s(gatt, characteristic.serviceId) ?: return sNull()
         val gattCharacteristic = c(service, characteristic.characteristicId) ?: return cNull()
-        @SuppressLint("MissingPermission")
-        if (callBack.checkPermissionConnect()) {
-            if (gatt.setCharacteristicNotification(gattCharacteristic, true)) {
-                Thread.sleep(1000L)
-                val descriptor = d(gattCharacteristic) ?: return dNull()
-                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    when (gatt.writeDescriptor(
-                        descriptor,
-                        BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                    )) {
-                        BluetoothStatusCodes.SUCCESS -> true
-                        BluetoothStatusCodes.ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION -> {
-                            Log.e(
-                                TAG,
-                                "writeCharacteristicT: ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION"
-                            )
-                            false
-                        }
-                        BluetoothStatusCodes.ERROR_GATT_WRITE_NOT_ALLOWED -> {
-                            Log.e(TAG, "writeCharacteristicT: ERROR_GATT_WRITE_NOT_ALLOWED")
-                            false
-                        }
-                        BluetoothStatusCodes.ERROR_UNKNOWN -> {
-                            Log.e(TAG, "writeCharacteristicT: ERROR_UNKNOWN")
-                            false
-                        }
-                        BluetoothStatusCodes.ERROR_GATT_WRITE_REQUEST_BUSY -> {
-                            Log.e(TAG, "writeCharacteristicT: ERROR_GATT_WRITE_REQUEST_BUSY")
-                            false
-                        }
-                        BluetoothStatusCodes.ERROR_PROFILE_SERVICE_NOT_BOUND -> {
-                            Log.e(TAG, "writeCharacteristicT: ERROR_PROFILE_SERVICE_NOT_BOUND")
-                            false
-                        }
-                        else -> {
-                            Log.e(TAG, "writeCharacteristicT: UnKnown")
-                            false
-                        }
-                    }
-                } else {
-                    @Suppress("DEPRECATION")
-                    descriptor.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                    @Suppress("DEPRECATION")
-                    gatt.writeDescriptor(descriptor)
+        if (!callBack.checkPermissionConnect()) return false
+        if (enableNotification.enable(characteristic)) {
+            if (!gatt.setCharacteristicNotification(gattCharacteristic, true))
+                return false
+            else Thread.sleep(1000L)
+        }
+        val descriptor = d(gattCharacteristic) ?: return dNull()
+        return writeDescriptor(gatt, descriptor, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun writeDescriptor(
+        gatt: BluetoothGatt,
+        descriptor: BluetoothGattDescriptor,
+        value: ByteArray
+    ): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when (gatt.writeDescriptor(
+                descriptor,
+                value
+            )) {
+                BluetoothStatusCodes.SUCCESS -> true
+                BluetoothStatusCodes.ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION -> {
+                    Log.e(
+                        TAG,
+                        "writeCharacteristicT: ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION"
+                    )
+                    false
+                }
+                BluetoothStatusCodes.ERROR_GATT_WRITE_NOT_ALLOWED -> {
+                    Log.e(TAG, "writeCharacteristicT: ERROR_GATT_WRITE_NOT_ALLOWED")
+                    false
+                }
+                BluetoothStatusCodes.ERROR_UNKNOWN -> {
+                    Log.e(TAG, "writeCharacteristicT: ERROR_UNKNOWN")
+                    false
+                }
+                BluetoothStatusCodes.ERROR_GATT_WRITE_REQUEST_BUSY -> {
+                    Log.e(TAG, "writeCharacteristicT: ERROR_GATT_WRITE_REQUEST_BUSY")
+                    false
+                }
+                BluetoothStatusCodes.ERROR_PROFILE_SERVICE_NOT_BOUND -> {
+                    Log.e(TAG, "writeCharacteristicT: ERROR_PROFILE_SERVICE_NOT_BOUND")
+                    false
+                }
+                else -> {
+                    Log.e(TAG, "writeCharacteristicT: UnKnown")
+                    false
                 }
             }
-            return false
+        } else {
+            @Suppress("DEPRECATION")
+            descriptor.value = value
+            @Suppress("DEPRECATION")
+            gatt.writeDescriptor(descriptor)
         }
-        return false
     }
 
     @SuppressLint("MissingPermission")

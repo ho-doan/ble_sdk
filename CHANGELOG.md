@@ -1,3 +1,7 @@
+## 0.0.7
+
+* fix set notification enable duplicated
+
 ## 0.0.6
 
 * update func connect with bonded failure
