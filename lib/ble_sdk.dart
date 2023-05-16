@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'ble_sdk_platform_interface.dart';
 import 'src/generated/blesdk.pb.dart';

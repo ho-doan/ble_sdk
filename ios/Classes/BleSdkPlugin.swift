@@ -117,7 +117,8 @@ public class BleSdkPlugin: NSObject, FlutterPlugin {
     }
     
     private func disconnect(result:@escaping FlutterResult){
-        result(bleClient.disconnect())
+        bleClient.disconnect()
+        result(true)
     }
     
     private func setNotification(_ call: FlutterMethodCall,result:@escaping FlutterResult){
@@ -257,6 +258,4 @@ extension BleSdkPlugin: BleClientDelegate{
         characteristicChannel.close(result)
         characteristicEvent.sendData(result)
     }
-    
-    
 }

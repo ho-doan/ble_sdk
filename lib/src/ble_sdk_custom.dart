@@ -6,7 +6,7 @@ class BleSdk extends BleSdkNative {
   Future<List<CharacteristicValue>> writeCharacteristicVsNotify(
     CharacteristicValue value, {
     List<Characteristic>? notifications,
-    int timeout = 1500,
+    int timeout = 500,
   }) async {
     List<CharacteristicValue> values;
     values = [];
@@ -19,8 +19,8 @@ class BleSdk extends BleSdkNative {
         timer!.cancel();
       }
       values.add(event);
-      timer = Timer.periodic(Duration(milliseconds: timeout), (timer) {
-        timer.cancel();
+      timer = Timer.periodic(Duration(milliseconds: timeout), (_) {
+        timer!.cancel();
         listen.cancel();
         completer.complete(values);
       });

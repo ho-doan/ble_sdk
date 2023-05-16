@@ -17,7 +17,12 @@ class DiscoveredServicesChannel{
     func close(_ value: Services){
         DispatchQueue.global(qos: .userInteractive).async {
             if let result = self._result{
-                result(try? value.serializedData())
+                do{
+                    let data = try value.serializedData()
+                    result(data)
+                }catch{
+                    print(error.localizedDescription)
+                }
                 self._result = nil
             }
         }

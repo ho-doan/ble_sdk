@@ -21,7 +21,7 @@ class StateConnectEvent: NSObject, FlutterStreamHandler{
     }
     
     func sendData(_ data: StateConnect) {
-        sink?(data)
+        sink?(data.rawValue)
         return
     }
 }

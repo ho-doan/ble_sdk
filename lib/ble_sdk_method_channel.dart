@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -35,6 +37,9 @@ class MethodChannelBleSdk extends BleSdkPlatform {
         .invokeMethod<bool>('connect', connectModel.writeToBuffer())
         .then((value) => value ?? false);
     if (!result) return false;
+    if (Platform.isIOS) {
+      await discoverServices();
+    }
     final bonded = await checkBonded();
     if (!bonded) {
       disconnect();

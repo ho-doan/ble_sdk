@@ -22,6 +22,7 @@ class BleClient : NSObject{
     private var isScanning = false
     private var deviceCurrent:CBPeripheral? = nil
     private var devicesScanner: [String:CBPeripheral] = [:]
+    private var charNotifications: [CBCharacteristic] = []
     private var pairing = false
     
     let delegate: BleClientDelegate
@@ -30,13 +31,13 @@ class BleClient : NSObject{
     init(delegate: BleClientDelegate) {
         self.delegate = delegate
         super.init()
-        self.manager = CBCentralManager(delegate: self, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: true])
+        self.manager = CBCentralManager(delegate: self, queue: .main)
     }
     //MARK: - start Scan
     func startScan(services: [String]){
         if self.manager.state == .poweredOn{
             self.isScanning = true
-            self.manager.scanForPeripherals(withServices: services.map{ service in CBUUID(string: service)}, options: [CBCentralManagerRestoredStateScanOptionsKey: true])
+            self.manager.scanForPeripherals(withServices: services.map{ service in CBUUID(string: service)}, options: nil)
         }
     }
     //MARK: - stop Scan
@@ -106,19 +107,19 @@ class BleClient : NSObject{
     }
     //MARK: - notificationCharacteristic
     func  notificationCharacteristic(_ value: Characteristic)->Bool{
-        if deviceCurrent == nil{
-            return false
-        }
         if let characteristic = getCharacteristic(value.serviceID, value.characteristicID){
-            deviceCurrent?.setNotifyValue(true, for: characteristic)
-            return true
+            return notificationCharacteristic(characteristic)
         }
         return false
     }
-    func  notificationCharacteristic(_ characteristic: CBCharacteristic)->Bool{
+    private func  notificationCharacteristic(_ characteristic: CBCharacteristic)->Bool{
         if deviceCurrent == nil{
             return false
         }
+        if charNotifications.first(where: {$0 == characteristic}) != nil{
+            return true
+        }
+        charNotifications.append(characteristic)
         deviceCurrent?.setNotifyValue(true, for: characteristic)
         return true
     }
@@ -128,13 +129,34 @@ class BleClient : NSObject{
         if pairing{
             return true
         }
-        for service in deviceCurrent!.services!{
-            for characteristic in service.characteristics!{
+        var char:CBCharacteristic? = nil
+        for service in deviceCurrent?.services ?? []{
+            for characteristic in service.characteristics ?? []{
                 if characteristic.properties.contains(.notifyEncryptionRequired){
+                    print("======= \(characteristic.uuid.uuidString)")
                     let _ = notificationCharacteristic(characteristic)
+                    char = characteristic
+                    break
                 }
                 if characteristic.properties.contains(.indicateEncryptionRequired){
+                    print("======= \(characteristic.uuid.uuidString)")
                     let _ = notificationCharacteristic(characteristic)
+                    char = characteristic
+                    break
+                }
+            }
+        }
+        if char == nil{
+            for service in deviceCurrent?.services ?? []{
+                for characteristic in service.characteristics ?? []{
+                    if characteristic.properties.contains(.indicate){
+                        let _ = notificationCharacteristic(characteristic)
+                        break
+                    }
+                    if characteristic.properties.contains(.notify){
+                        let _ = notificationCharacteristic(characteristic)
+                        break
+                    }
                 }
             }
         }
@@ -170,14 +192,16 @@ extension BleClient: CBCentralManagerDelegate{
         }
         self.delegate.bonded(self.pairing)
         self.delegate.onConnectionStateChange(StateConnect.disconnected)
+        self.charNotifications = []
         self.deviceCurrent = nil
     }
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         if let err = error{
-            print("centralManager didFailToConnect \(String(describing: peripheral.name)) \(String(describing: err))")
+            print("centralManager didFailToConnect \(String(describing: peripheral.name)) \(String(describing: err.localizedDescription))")
         }
         self.delegate.bonded(self.pairing)
         self.delegate.onConnectionStateChange(StateConnect.disconnected)
+        self.charNotifications = []
         self.deviceCurrent = nil
     }
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
@@ -186,6 +210,7 @@ extension BleClient: CBCentralManagerDelegate{
         self.delegate.onConnectionStateChange(StateConnect.connected)
     }
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        self.devicesScanner[peripheral.identifier.uuidString] = peripheral
         var model = BluetoothBLEModel()
         model.bonded = false
         model.id = peripheral.identifier.uuidString
@@ -219,6 +244,7 @@ extension BleClient: CBPeripheralDelegate{
         if let e = error as NSError? {
             print("Error : \(e), Description : \(e.userInfo.description)")
         }
+        print("didUpdateNotificationStateFor \(characteristic.uuid.uuidString)")
         self.pairing = true
         self.delegate.bonded(true)
     }
