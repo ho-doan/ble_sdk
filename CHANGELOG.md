@@ -1,3 +1,7 @@
+## 0.1.1
+
+* fix bug, test connect and sync data devices glucoses (android)
+
 ## 0.1.0
 
 * fix bug, test connect and sync data devices glucoses

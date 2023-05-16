@@ -148,6 +148,7 @@ class BleClient(
                 if (status != BluetoothDevice.BOND_BONDED) {
                     gatt.device.createBond()
                 }
+                Thread.sleep(150L)
                 callBack.onCharacteristicValue(characteristic, value)
                 super.onCharacteristicRead(gatt, characteristic, value, status)
             }
@@ -210,8 +211,8 @@ class BleClient(
                 BluetoothDevice.ACTION_BOND_STATE_CHANGED -> {
                     when (p1.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1)) {
                         BluetoothDevice.BOND_BONDING -> {
-                            callBack.bonded(false)
-                            isBonded = false
+//                            callBack.bonded(false)
+//                            isBonded = false
                         }
                         BluetoothDevice.BOND_BONDED -> {
                             callBack.bonded(true)
@@ -327,6 +328,7 @@ class BleClient(
             c(service, characteristic.characteristic.characteristicId) ?: return cNull()
         if (!callBack.checkPermissionConnect()) return false
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Thread.sleep(150L)
             when (gatt.writeCharacteristic(
                 gattCharacteristic,
                 valueArgs,
@@ -362,6 +364,7 @@ class BleClient(
             @Suppress("DEPRECATION")
             gattCharacteristic.value = valueArgs
             gattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            Thread.sleep(150L)
             @Suppress("DEPRECATION")
             gatt.writeCharacteristic(gattCharacteristic)
         }
