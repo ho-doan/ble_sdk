@@ -1,3 +1,7 @@
+## 0.1.0
+
+* fix bug, test connect and sync data devices glucoses
+
 ## 0.0.7
 
 * fix set notification enable duplicated
