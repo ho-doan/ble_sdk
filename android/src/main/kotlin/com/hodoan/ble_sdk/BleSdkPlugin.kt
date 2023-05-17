@@ -133,7 +133,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     }
 
     private fun checkPermission(result: Result) {
-        result.success(checkPermissionConnect() && checkPermissionScan())
+        result.success(if(checkPermissionConnect() && checkPermissionScan()) 0 else 2)
     }
 
     private fun startScan(call: MethodCall, result: Result) {
