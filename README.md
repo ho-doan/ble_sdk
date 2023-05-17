@@ -25,7 +25,7 @@
 #### Android ProGuard rules
 
 ```txt
--keep class com.signify.hue.** { *; }
+-keep class com.hodoan.ble_sdk.** { *; }
 ```
 
 ### ios
