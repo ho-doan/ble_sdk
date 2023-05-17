@@ -1,3 +1,6 @@
+## 0.1.2
+
+* update check permission android
 ## 0.1.1
 
 * fix bug, test connect and sync data devices glucoses (android)

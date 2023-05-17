@@ -1,6 +1,6 @@
 name: ble_sdk
 description: Bluetooth Low Energy (BLE) plugin that can communicate with single device
-version: 0.1.1
+version: 0.1.2
 homepage: https://github.com/ho-doan/ble_sdk
 # publish_to: https://github.com/ho-doan/ble_sdk
 
