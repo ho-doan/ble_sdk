@@ -22,6 +22,9 @@ class _ScanPageState extends State<ScanPage> {
   @override
   void initState() {
     super.initState();
+    BleSdk.instance
+        .isBluetoothAvailable()
+        .then((value) => log(value.toString()));
   }
 
   @override
