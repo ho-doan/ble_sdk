@@ -320,7 +320,9 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
 
     override fun enableBluetooth() {
         val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-        ActivityCompat.startActivityForResult(activity, enableBtIntent, 1, Bundle())
+        if(this::activity.isInitialized) {
+            ActivityCompat.startActivityForResult(activity, enableBtIntent, 1, Bundle())
+        }
     }
 
     override fun onScanResult(result: BluetoothBLEModel) {
