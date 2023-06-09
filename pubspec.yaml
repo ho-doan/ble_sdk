@@ -5,7 +5,7 @@ homepage: https://github.com/ho-doan/ble_sdk
 # publish_to: https://github.com/ho-doan/ble_sdk
 
 environment:
-  sdk: '>=2.19.4 <3.0.0'
+  sdk: '>=2.19.4 <4.0.0'
   flutter: ">=2.5.0"
 
 dependencies:
