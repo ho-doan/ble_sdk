@@ -259,6 +259,7 @@ class BleClient(
         isScan = false
         @SuppressLint("MissingPermission")
         if (callBack.checkPermissionScan()) {
+            scanner.flushPendingScanResults(scanCallback)
             scanner.stopScan(scanCallback)
         }
     }
