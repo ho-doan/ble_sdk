@@ -1,3 +1,8 @@
+## 0.1.4
+
+- fix check bonded ios
+- fix connect ios
+
 ## 0.1.3
 
 - fix late init sdk android
