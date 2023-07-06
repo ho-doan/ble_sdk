@@ -42,7 +42,7 @@ class MethodChannelBleSdk extends BleSdkPlatform {
     }
     final bonded = await checkBonded();
     if (!bonded) {
-      disconnect();
+      await disconnect();
     }
     return bonded;
   }

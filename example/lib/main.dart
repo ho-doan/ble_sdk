@@ -139,8 +139,8 @@ class _ScanPageState extends State<ScanPage> {
                             BleSdk.instance
                                 .connect(deviceId: device.id)
                                 .then((value) {
+                              log('message $value');
                               if (value) {
-                                log('message $value');
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (ctx) =>
@@ -188,6 +188,7 @@ class _DevicePageState extends State<DevicePage> {
   List<Service> _services = [];
   List<String> _logs = [];
   late StreamSubscription logStream;
+  late StreamSubscription subscription;
   @override
   void initState() {
     logStream = BleSdk.instance.logResult.listen((event) {
@@ -196,17 +197,18 @@ class _DevicePageState extends State<DevicePage> {
             '${event.characteristic.characteristicId.replaceAll('0000', '').split('-').first}: ${event.message}'));
     });
     super.initState();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   BleSdk.instance.stateConnectResult.listen((event) {
-    //     if (event == StateConnect.DISCONNECTED) {
-    //       Navigator.of(context).pop();
-    //     }
-    //   });
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      subscription = BleSdk.instance.stateConnectResult.listen((event) {
+        if (event == StateConnect.disconnected) {
+          Navigator.of(context).pop();
+        }
+      });
+    });
   }
 
   @override
   void dispose() {
+    subscription.cancel();
     logStream.cancel();
     super.dispose();
   }

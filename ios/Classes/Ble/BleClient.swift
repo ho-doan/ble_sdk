@@ -23,7 +23,10 @@ class BleClient : NSObject{
     private var deviceCurrent:CBPeripheral? = nil
     private var devicesScanner: [String:CBPeripheral] = [:]
     private var charNotifications: [CBCharacteristic] = []
-    private var pairing = false
+    
+    private var services:[CBUUID] = []
+    
+    private var countCheckBonded = 0
     
     let delegate: BleClientDelegate
     
@@ -35,9 +38,10 @@ class BleClient : NSObject{
     }
     //MARK: - start Scan
     func startScan(services: [String]){
+        self.services = services.map{ service in CBUUID(string: service)}
         if self.manager.state == .poweredOn{
             self.isScanning = true
-            self.manager.scanForPeripherals(withServices: services.map{ service in CBUUID(string: service)}, options: nil)
+            self.manager.scanForPeripherals(withServices: self.services, options: nil)
         }
     }
     //MARK: - stop Scan
@@ -126,39 +130,33 @@ class BleClient : NSObject{
     
     //MARK: - checkBonded
     func checkBonded() -> Bool{
-        if pairing{
-            return true
-        }
-        var char:CBCharacteristic? = nil
-        for service in deviceCurrent?.services ?? []{
+        let services: [CBService] = deviceCurrent?.services ?? []
+        var servicesCheck: [CBService] = services.filter({self.services.contains($0.uuid)})
+        servicesCheck.reverse()
+        
+        var lstChar: [CBCharacteristic] = []
+        
+        for service in servicesCheck{
             for characteristic in service.characteristics ?? []{
                 if characteristic.properties.contains(.notifyEncryptionRequired){
-                    print("======= \(characteristic.uuid.uuidString)")
-                    let _ = notificationCharacteristic(characteristic)
-                    char = characteristic
-                    break
+                    lstChar.append(characteristic)
                 }
                 if characteristic.properties.contains(.indicateEncryptionRequired){
-                    print("======= \(characteristic.uuid.uuidString)")
-                    let _ = notificationCharacteristic(characteristic)
-                    char = characteristic
-                    break
+                    lstChar.append(characteristic)
                 }
+                if characteristic.properties.contains(.indicate){
+                    lstChar.append(characteristic)
+                }
+                if characteristic.properties.contains(.notify){
+                    lstChar.append(characteristic)
+                }
+
             }
         }
-        if char == nil{
-            for service in deviceCurrent?.services ?? []{
-                for characteristic in service.characteristics ?? []{
-                    if characteristic.properties.contains(.indicate){
-                        let _ = notificationCharacteristic(characteristic)
-                        break
-                    }
-                    if characteristic.properties.contains(.notify){
-                        let _ = notificationCharacteristic(characteristic)
-                        break
-                    }
-                }
-            }
+        self.countCheckBonded = lstChar.count
+        for characteristic in lstChar{
+            print("char check bonded \(characteristic.uuid.uuidString)")
+            let _ = notificationCharacteristic(characteristic)
         }
         return false
     }
@@ -190,7 +188,7 @@ extension BleClient: CBCentralManagerDelegate{
         if let err = error{
             print("centralManager didFailToConnect \(String(describing: peripheral.name)) \(String(describing: err))")
         }
-        self.delegate.bonded(self.pairing)
+        self.delegate.bonded(false)
         self.delegate.onConnectionStateChange(StateConnect.disconnected)
         self.charNotifications = []
         self.deviceCurrent = nil
@@ -199,7 +197,7 @@ extension BleClient: CBCentralManagerDelegate{
         if let err = error{
             print("centralManager didFailToConnect \(String(describing: peripheral.name)) \(String(describing: err.localizedDescription))")
         }
-        self.delegate.bonded(self.pairing)
+        self.delegate.bonded(false)
         self.delegate.onConnectionStateChange(StateConnect.disconnected)
         self.charNotifications = []
         self.deviceCurrent = nil
@@ -243,10 +241,16 @@ extension BleClient: CBPeripheralDelegate{
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         if let e = error as NSError? {
             print("Error : \(e), Description : \(e.userInfo.description)")
+            if e.domain == CBATTErrorDomain && e.code == 15{
+                self.delegate.bonded(false)
+                self.countCheckBonded = -1
+            }
         }
         print("didUpdateNotificationStateFor \(characteristic.uuid.uuidString)")
-        self.pairing = true
-        self.delegate.bonded(true)
+        self.countCheckBonded = self.countCheckBonded - 1
+        if self.countCheckBonded == 0{
+            self.delegate.bonded(true)
+        }
     }
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         if let err = error{
