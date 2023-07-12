@@ -1,3 +1,7 @@
+## 0.1.5-dev
+
+- downgrade gradle 4.1.3 android
+
 ## 0.1.4
 
 - fix check bonded ios
