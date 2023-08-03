@@ -1,3 +1,7 @@
+## 0.1.5
+
+- delay write notification characteristic
+
 ## 0.1.4
 
 - fix check bonded ios
