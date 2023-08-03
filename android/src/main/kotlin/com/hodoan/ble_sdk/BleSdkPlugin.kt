@@ -223,12 +223,12 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     private fun setIndication(call: MethodCall, result: Result) {
         val charValue = Characteristic.parseFrom(call.arguments as ByteArray)
         val isResult = bleClient.indicationCharacteristic(charValue)
-        //if (isResult) {
-        //    logEvent.success(
-        //        Log.newBuilder().setCharacteristic(charValue)
-        //            .setMessage("indicator ${charValue.characteristicId}").build()
-        //    )
-        }
+//        if (isResult) {
+//            logEvent.success(
+//                Log.newBuilder().setCharacteristic(charValue)
+//                    .setMessage("indicator ${charValue.characteristicId}").build()
+//            )
+//        }
         logEvent.success(
             Log.newBuilder().setCharacteristic(charValue)
                 .setMessage("indicator ${charValue.characteristicId} status bool: $isResult").build())
