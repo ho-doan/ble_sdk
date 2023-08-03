@@ -216,7 +216,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         val isResult = bleClient.notificationCharacteristic(charValue)
         logEvent.success(
             Log.newBuilder().setCharacteristic(charValue)
-                .setMessage("notification ${charValue.characteristicId} status bool: $isResult").build()
+                .setMessage("notification ${charValue.characteristicId} status bool: $isResult").build())
         result.success(isResult)
     }
 
@@ -231,7 +231,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         }
         logEvent.success(
             Log.newBuilder().setCharacteristic(charValue)
-                .setMessage("indicator ${charValue.characteristicId} status bool: $isResult").build()
+                .setMessage("indicator ${charValue.characteristicId} status bool: $isResult").build())
         result.success(isResult)
     }
 
