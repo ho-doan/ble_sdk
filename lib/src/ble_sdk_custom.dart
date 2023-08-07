@@ -50,9 +50,12 @@ class BleSdk extends BleSdkNative {
     // if (!checkNotify) {
     //   await Future.forEach(listNotifications, (notify) => notify);
     // }
+    final notificationsCP = notifications ?? <Characteristic>[];
+    final check = notificationsCP.any(
+        (e) => e.characteristicId == value.characteristic.characteristicId);
     final listNotifications = [
-      value.characteristic,
-      for (final notify in notifications ?? <Characteristic>[]) notify,
+      if (!check) value.characteristic,
+      for (final notify in notificationsCP) notify,
     ]
         .map(
           (e) => Future<bool>(() {

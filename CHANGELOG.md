@@ -1,3 +1,7 @@
+## 0.1.8
+
+- update writeCharacteristicVsNotify
+
 ## 0.1.7
 
 - clean code
