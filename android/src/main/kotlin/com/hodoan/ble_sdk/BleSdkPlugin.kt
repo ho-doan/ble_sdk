@@ -136,20 +136,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         result.success(if(checkPermissionConnect() && checkPermissionScan()) 0 else 2)
     }
 
-    private fun reInitClient(){
-        var manager = getManager(context)
-        if (manager?.adapter?.isEnabled == false) {
-            enableBluetooth()
-            manager = getManager(context)
-        }
-        manager?.let {
-            bleClient = BleClient(context, manager.adapter, this)
-            bleClient.listen(context)
-        }
-    }
-
     private fun startScan(call: MethodCall, result: Result) {
-        reInitClient()
         devices = listOf()
         val scanModel = ScanModel.parseFrom(call.arguments as ByteArray)
         bleClient.scan(scanModel.servicesList)
