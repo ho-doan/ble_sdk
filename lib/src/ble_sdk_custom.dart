@@ -25,31 +25,6 @@ class BleSdk extends BleSdkNative {
         completer.complete(values);
       });
     });
-    // final listNotifications = [
-    //   value.characteristic,
-    //   for (final notify in notifications ?? <Characteristic>[]) notify,
-    // ].map(
-    //   (e) => Future(() {
-    //     if (e.properties.contains(CharacteristicProperties.NOTIFY)) {
-    //       setNotification(e);
-    //     }
-    //     if (e.properties.contains(CharacteristicProperties.INDICATE)) {
-    //       setIndication(e);
-    //     }
-    //   }),
-    // );
-    // final checkNotify = value.characteristic.properties
-    //         .contains(CharacteristicProperties.NOTIFY) ||
-    //     value.characteristic.properties
-    //         .contains(CharacteristicProperties.INDICATE);
-    // if (checkNotify) {
-    //   await Future.forEach(listNotifications, (notify) => notify);
-    //   await Future<void>.delayed(const Duration(milliseconds: 450));
-    // }
-    // final isWrite = await writeCharacteristicNoResponse(value);
-    // if (!checkNotify) {
-    //   await Future.forEach(listNotifications, (notify) => notify);
-    // }
     final notificationsCP = notifications ?? <Characteristic>[];
     final check = notificationsCP.any(
         (e) => e.characteristicId == value.characteristic.characteristicId);
@@ -74,10 +49,6 @@ class BleSdk extends BleSdkNative {
         value.characteristic.properties
             .contains(CharacteristicProperties.INDICATE);
     if (checkNotify) {
-      // final result = await Future.wait(listNotifications);
-      // if (result.any((e) => e == false)) {
-      //   return [];
-      // }
       for (final notification in listNotifications) {
         await Future<void>.delayed(const Duration(milliseconds: 350));
         final r = await notification;

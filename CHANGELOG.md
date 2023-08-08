@@ -1,3 +1,7 @@
+## 0.1.9
+
+- remove check notification
+
 ## 0.1.8
 
 - update writeCharacteristicVsNotify

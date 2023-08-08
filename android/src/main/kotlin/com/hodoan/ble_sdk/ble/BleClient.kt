@@ -17,7 +17,7 @@ import com.hodoan.ble_sdk.ProtobufModel
 import com.hodoan.ble_sdk.ProtobufModel.Characteristic
 import com.hodoan.ble_sdk.ProtobufModel.CharacteristicValue
 import com.hodoan.ble_sdk.ProtobufModel.ConnectModel
-import com.hodoan.ble_sdk.ble.utils.EnableNotification
+//import com.hodoan.ble_sdk.ble.utils.EnableNotification
 import com.hodoan.ble_sdk.utils.UuidConvert
 import java.lang.reflect.Method
 
@@ -67,7 +67,7 @@ class BleClient(
     @Suppress("PrivatePropertyName")
     private val TAG = BleClient::class.simpleName
     private val scanner = adapter.bluetoothLeScanner
-    private val enableNotification = EnableNotification()
+//    private val enableNotification = EnableNotification()
 
     private var scanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanFailed(errorCode: Int) {
@@ -123,7 +123,7 @@ class BleClient(
                         callBack.onConnectionStateChange(ProtobufModel.StateConnect.disconnecting)
                     }
                     BluetoothProfile.STATE_DISCONNECTED -> {
-                        enableNotification.dispose()
+//                        enableNotification.dispose()
                         isBonded = false
                         gattCurrent = null
                         callBack.onConnectionStateChange(ProtobufModel.StateConnect.disconnected)
@@ -377,11 +377,11 @@ class BleClient(
         val service = s(gatt, characteristic.serviceId) ?: return sNull()
         val gattCharacteristic = c(service, characteristic.characteristicId) ?: return cNull()
         if (!callBack.checkPermissionConnect()) return false
-        if (enableNotification.enable(characteristic)) {
-            if (!gatt.setCharacteristicNotification(gattCharacteristic, true))
-                return false
-            else Thread.sleep(1000L)
-        }
+//        if (enableNotification.enable(characteristic)) {
+        if (!gatt.setCharacteristicNotification(gattCharacteristic, true))
+            return false
+        else Thread.sleep(1000L)
+//        }
         val descriptor = d(gattCharacteristic) ?: return dNull()
         return writeDescriptor(gatt, descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
     }
@@ -392,11 +392,11 @@ class BleClient(
         val service = s(gatt, characteristic.serviceId) ?: return sNull()
         val gattCharacteristic = c(service, characteristic.characteristicId) ?: return cNull()
         if (!callBack.checkPermissionConnect()) return false
-        if (enableNotification.enable(characteristic)) {
-            if (!gatt.setCharacteristicNotification(gattCharacteristic, true))
-                return false
-            else Thread.sleep(1000L)
-        }
+//        if (enableNotification.enable(characteristic)) {
+        if (!gatt.setCharacteristicNotification(gattCharacteristic, true))
+            return false
+        else Thread.sleep(1000L)
+//        }
         val descriptor = d(gattCharacteristic) ?: return dNull()
         return writeDescriptor(gatt, descriptor, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
     }
