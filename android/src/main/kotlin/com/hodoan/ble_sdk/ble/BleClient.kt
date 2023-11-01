@@ -47,7 +47,7 @@ interface IBleClientCallBack {
     fun checkPermissionConnect(): Boolean
     fun checkPermissionScan(): Boolean
     fun requestPermission()
-    fun enableLocation()
+    fun enableLocation(): Boolean
     fun enableBluetooth()
     fun onScanResult(result: ProtobufModel.BluetoothBLEModel)
     fun onConnectionStateChange(state: ProtobufModel.StateConnect)

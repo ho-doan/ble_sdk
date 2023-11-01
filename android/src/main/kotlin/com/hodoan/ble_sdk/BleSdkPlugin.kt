@@ -55,18 +55,9 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         context = binding.applicationContext
-        var manager = getManager(context)
-        enableLocation()
-        if (manager?.adapter?.isEnabled == false) {
-            enableBluetooth()
-            manager = getManager(context)
-        }
-        manager?.let {
-            bleClient = BleClient(context, manager.adapter, this)
-            bleClient.listen(context)
-        }
         channel = MethodChannel(binding.binaryMessenger, "ble_sdk")
         channel.setMethodCallHandler(this)
+        initialSdk()
         EventChannel(binding.binaryMessenger, "ble_sdk_scan").setStreamHandler(scanEvent)
         EventChannel(binding.binaryMessenger, "ble_sdk_connect").setStreamHandler(stateConnectEvent)
         EventChannel(binding.binaryMessenger, "ble_sdk_bluetooth").setStreamHandler(
@@ -85,6 +76,8 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
+        val check = initialSdk(result)
+        if (!check) return
         when (call.method) {
             "turnOnBluetooth" -> turnOnBluetooth(result)
             "requestPermission" -> requestPermission(result)
@@ -115,6 +108,28 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         result.success(null)
     }
 
+    private fun initialSdk(result: Result? = null): Boolean {
+        if (this::bleClient.isInitialized) return true
+        val manager = getManager(context)
+        val location = enableLocation()
+        if (!location) {
+            result?.error("1", "Please enable location", null)
+            return false
+        }
+        if (manager?.adapter?.isEnabled == false) {
+            enableBluetooth()
+            result?.error("2", "Please enable Bluetooth", null)
+            return false
+        }
+        manager?.let {
+            bleClient = BleClient(context, manager.adapter, this)
+            bleClient.listen(context)
+            return true
+        }
+        result?.error("3", "not init bleClient, please debug", null)
+        return false
+    }
+
     private fun requestPermission(result: Result) {
         permissionChannel.createRequest(result)
         requestPermission()
@@ -133,7 +148,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     }
 
     private fun checkPermission(result: Result) {
-        result.success(if(checkPermissionConnect() && checkPermissionScan()) 0 else 2)
+        result.success(if (checkPermissionConnect() && checkPermissionScan()) 0 else 2)
     }
 
     private fun startScan(call: MethodCall, result: Result) {
@@ -216,7 +231,9 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         val isResult = bleClient.notificationCharacteristic(charValue)
         logEvent.success(
             Log.newBuilder().setCharacteristic(charValue)
-                .setMessage("notification ${charValue.characteristicId} status bool: $isResult").build())
+                .setMessage("notification ${charValue.characteristicId} status bool: $isResult")
+                .build()
+        )
         result.success(isResult)
     }
 
@@ -231,7 +248,9 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
 //        }
         logEvent.success(
             Log.newBuilder().setCharacteristic(charValue)
-                .setMessage("indicator ${charValue.characteristicId} status bool: $isResult").build())
+                .setMessage("indicator ${charValue.characteristicId} status bool: $isResult")
+                .build()
+        )
         result.success(isResult)
     }
 
@@ -298,7 +317,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         }
     }
 
-    override fun enableLocation() {
+    override fun enableLocation(): Boolean {
         val check = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val lm: LocationManager =
                 context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -311,16 +330,21 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
             )
             mode != Settings.Secure.LOCATION_MODE_OFF
         }
-        if (check) return
-        val intent = Intent(
-            Settings.ACTION_LOCATION_SOURCE_SETTINGS
-        )
-        activity.startActivity(intent)
+        if (!check) {
+            if (!this::activity.isInitialized) {
+                return false
+            }
+            val intent = Intent(
+                Settings.ACTION_LOCATION_SOURCE_SETTINGS
+            )
+            activity.startActivity(intent)
+        }
+        return check
     }
 
     override fun enableBluetooth() {
         val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-        if(this::activity.isInitialized) {
+        if (this::activity.isInitialized) {
             ActivityCompat.startActivityForResult(activity, enableBtIntent, 1, Bundle())
         }
     }

@@ -1,3 +1,7 @@
+# 0.2.1 10-01-2023
+
+- fix not isInitialized bleSdk(android)
+
 ## 0.2.0
 
 - remove check notification
