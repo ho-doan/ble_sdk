@@ -1,5 +1,6 @@
 package com.hodoan.ble_sdk.ble
 
+//import com.hodoan.ble_sdk.ble.utils.EnableNotification
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
@@ -10,14 +11,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.location.LocationManager
 import android.os.Build
 import android.os.ParcelUuid
 import android.util.Log
 import com.hodoan.ble_sdk.ProtobufModel
-import com.hodoan.ble_sdk.ProtobufModel.Characteristic
-import com.hodoan.ble_sdk.ProtobufModel.CharacteristicValue
-import com.hodoan.ble_sdk.ProtobufModel.ConnectModel
-//import com.hodoan.ble_sdk.ble.utils.EnableNotification
+import com.hodoan.ble_sdk.ProtobufModel.*
 import com.hodoan.ble_sdk.utils.UuidConvert
 import java.lang.reflect.Method
 
@@ -34,9 +33,9 @@ interface IBleClient {
     fun notificationCharacteristic(characteristic: Characteristic): Boolean
     fun indicationCharacteristic(characteristic: Characteristic): Boolean
     fun writeDescriptor(
-        gatt: BluetoothGatt,
-        descriptor: BluetoothGattDescriptor,
-        value: ByteArray
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            value: ByteArray
     ): Boolean
 
     fun unBonded(deviceId: String): Boolean
@@ -49,6 +48,7 @@ interface IBleClientCallBack {
     fun requestPermission()
     fun enableLocation(): Boolean
     fun enableBluetooth()
+    fun locationListener(status: Boolean)
     fun onScanResult(result: ProtobufModel.BluetoothBLEModel)
     fun onConnectionStateChange(state: ProtobufModel.StateConnect)
     fun onServicesDiscovered(services: List<BluetoothGattService>, deviceId: String)
@@ -58,11 +58,11 @@ interface IBleClientCallBack {
 }
 
 class BleClient(
-    private val context: Context,
-    private val adapter: BluetoothAdapter,
-    private val callBack: IBleClientCallBack
+        private val context: Context,
+        private val adapter: BluetoothAdapter,
+        private val callBack: IBleClientCallBack
 ) :
-    IBleClient {
+        IBleClient {
 
     @Suppress("PrivatePropertyName")
     private val TAG = BleClient::class.simpleName
@@ -140,10 +140,10 @@ class BleClient(
 
             @SuppressLint("MissingPermission")
             override fun onCharacteristicRead(
-                gatt: BluetoothGatt,
-                characteristic: BluetoothGattCharacteristic,
-                value: ByteArray,
-                status: Int
+                    gatt: BluetoothGatt,
+                    characteristic: BluetoothGattCharacteristic,
+                    value: ByteArray,
+                    status: Int
             ) {
                 if (status != BluetoothDevice.BOND_BONDED) {
                     gatt.device.createBond()
@@ -156,9 +156,9 @@ class BleClient(
             @Suppress("DEPRECATION")
             @Deprecated("Deprecated in Java")
             override fun onCharacteristicRead(
-                gatt: BluetoothGatt?,
-                characteristic: BluetoothGattCharacteristic?,
-                status: Int
+                    gatt: BluetoothGatt?,
+                    characteristic: BluetoothGattCharacteristic?,
+                    status: Int
             ) {
                 @SuppressLint("MissingPermission")
                 if (status != BluetoothDevice.BOND_BONDED) {
@@ -171,9 +171,9 @@ class BleClient(
             }
 
             override fun onCharacteristicChanged(
-                gatt: BluetoothGatt,
-                characteristic: BluetoothGattCharacteristic,
-                value: ByteArray
+                    gatt: BluetoothGatt,
+                    characteristic: BluetoothGattCharacteristic,
+                    value: ByteArray
             ) {
                 callBack.onCharacteristicValue(characteristic, value)
                 super.onCharacteristicChanged(gatt, characteristic, value)
@@ -182,8 +182,8 @@ class BleClient(
             @Suppress("DEPRECATION")
             @Deprecated("Deprecated in Java")
             override fun onCharacteristicChanged(
-                gatt: BluetoothGatt?,
-                characteristic: BluetoothGattCharacteristic?
+                    gatt: BluetoothGatt?,
+                    characteristic: BluetoothGattCharacteristic?
             ) {
                 characteristic?.let {
                     callBack.onCharacteristicValue(it, it.value)
@@ -198,8 +198,8 @@ class BleClient(
             when (p1?.action) {
                 BluetoothAdapter.ACTION_STATE_CHANGED -> {
                     when (p1.getIntExtra(
-                        BluetoothAdapter.EXTRA_STATE,
-                        BluetoothAdapter.ERROR
+                            BluetoothAdapter.EXTRA_STATE,
+                            BluetoothAdapter.ERROR
                     )) {
                         BluetoothAdapter.STATE_OFF -> callBack.bleState(ProtobufModel.StateBluetooth.off)
                         BluetoothAdapter.STATE_ON -> callBack.bleState(ProtobufModel.StateBluetooth.on)
@@ -232,6 +232,27 @@ class BleClient(
         }
     }
 
+    companion object {
+        fun listenLocation(context: Context, callBack: IBleClientCallBack) {
+            val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+            filter.addAction(Intent.ACTION_PROVIDER_CHANGED)
+            context.registerReceiver(receiver(callBack), filter)
+        }
+
+        private fun receiver(callBack: IBleClientCallBack) = object : BroadcastReceiver() {
+            override fun onReceive(p0: Context?, p1: Intent?) {
+                when (p1?.action) {
+                    LocationManager.PROVIDERS_CHANGED_ACTION -> {
+                        val locationManager = p0?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+                        val isGpsEnabled = locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                        val isNetworkEnabled = locationManager?.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                        callBack.locationListener(isGpsEnabled == true || isNetworkEnabled == true)
+                    }
+                }
+            }
+        }
+    }
+
     private var isScan = false
     var isBonded = false
     private var gattCurrent: BluetoothGatt? = null
@@ -249,7 +270,7 @@ class BleClient(
             ScanFilter.Builder().setServiceUuid(ParcelUuid(UuidConvert.checkUUID(it))).build()
         }
         val scanSettings =
-            ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
+                ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
         isScan = true
         if (!callBack.checkPermissionScan()) return
         scanner.startScan(filters, scanSettings, scanCallback)
@@ -278,7 +299,7 @@ class BleClient(
             device?.createBond()
         }
         val gatt =
-            device?.connectGatt(context, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
+                device?.connectGatt(context, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
         refreshDeviceCache(gatt)
         isBonded = device?.bondState == BluetoothDevice.BOND_BONDED
         return gatt != null
@@ -320,20 +341,20 @@ class BleClient(
 
     @SuppressLint("MissingPermission")
     override fun writeCharacteristic(
-        characteristic: CharacteristicValue
+            characteristic: CharacteristicValue
     ): Boolean {
         val valueArgs = characteristic.dataList.map { it.toByte() }.toByteArray()
         val gatt = g() ?: return gNull()
         val service = s(gatt, characteristic.characteristic.serviceId) ?: return sNull()
         val gattCharacteristic =
-            c(service, characteristic.characteristic.characteristicId) ?: return cNull()
+                c(service, characteristic.characteristic.characteristicId) ?: return cNull()
         if (!callBack.checkPermissionConnect()) return false
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Thread.sleep(150L)
             when (gatt.writeCharacteristic(
-                gattCharacteristic,
-                valueArgs,
-                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                    gattCharacteristic,
+                    valueArgs,
+                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
             )) {
                 BluetoothStatusCodes.SUCCESS -> true
                 BluetoothStatusCodes.ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION -> {
@@ -403,20 +424,20 @@ class BleClient(
 
     @SuppressLint("MissingPermission")
     override fun writeDescriptor(
-        gatt: BluetoothGatt,
-        descriptor: BluetoothGattDescriptor,
-        value: ByteArray
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            value: ByteArray
     ): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when (gatt.writeDescriptor(
-                descriptor,
-                value
+                    descriptor,
+                    value
             )) {
                 BluetoothStatusCodes.SUCCESS -> true
                 BluetoothStatusCodes.ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION -> {
                     Log.e(
-                        TAG,
-                        "writeCharacteristicT: ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION"
+                            TAG,
+                            "writeCharacteristicT: ERROR_MISSING_BLUETOOTH_CONNECT_PERMISSION"
                     )
                     false
                 }
@@ -481,8 +502,8 @@ class BleClient(
     }
 
     private fun c(
-        service: BluetoothGattService,
-        characteristicId: String
+            service: BluetoothGattService,
+            characteristicId: String
     ): BluetoothGattCharacteristic? {
         return service.getCharacteristic(UuidConvert.checkUUID(characteristicId))
     }

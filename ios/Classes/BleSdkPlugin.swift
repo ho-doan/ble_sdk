@@ -35,7 +35,9 @@ public class BleSdkPlugin: NSObject, FlutterPlugin {
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
+        case "initialSdk": result(true)
         case "turnOnBluetooth": turnOnBluetooth(result: result)
+        case "turnOnLocation": turnOnLocation(result: result)
         case "requestPermission": requestPermission(result: result)
         case "requestPermissionSettings": requestPermission(result: result)
         case "checkPermission": checkPermission(result: result)
@@ -53,6 +55,7 @@ public class BleSdkPlugin: NSObject, FlutterPlugin {
             //TODO: chua lam
         case "unBonded": turnOnBluetooth(result: result)
         case "isBluetoothAvailable": isBluetoothAvailable(result: result)
+        case "isLocationAvailable": isLocationAvailable(result: result)
         default: result(FlutterMethodNotImplemented)
         }
     }
@@ -153,7 +156,16 @@ public class BleSdkPlugin: NSObject, FlutterPlugin {
             })
         }
     }
-    
+
+    private func turnOnLocation(result:@escaping FlutterResult){
+        guard let settingsUrl = URL(string: "App-Prefs:LOCATION_SERVICES") else { return }
+        if UIApplication.shared.canOpenURL(settingsUrl) {
+            UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                print("Settings opened: \(success)") // Prints true
+            })
+        }
+    }
+
     private func discoverServices(result:@escaping FlutterResult){
         discoveredServicesChannel.create(result)
         let data = bleClient.discoverServices()
@@ -164,6 +176,10 @@ public class BleSdkPlugin: NSObject, FlutterPlugin {
     
     private func isBluetoothAvailable(result:@escaping FlutterResult){
         result(bleClient.isBluetoothAvailable())
+    }
+    
+    private func isLocationAvailable(result:@escaping FlutterResult){
+        result(bleClient.isLocationAvailable())
     }
     
     private func checkPermission(result:@escaping FlutterResult){

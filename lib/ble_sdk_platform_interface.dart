@@ -110,9 +110,22 @@ abstract class BleSdkPlatform extends PlatformInterface {
     throw UnimplementedError('turnOnBluetooth() has not been implemented.');
   }
 
+  /// turn on location
+  Future<void> turnOnLocation() async {
+    throw UnimplementedError('turnOnBluetooth() has not been implemented.');
+  }
+
   /// check bluetooth on/off
   Future<bool> isBluetoothAvailable() => throw UnimplementedError(
       'isBluetoothAvailable() has not been implemented.');
+
+  /// check location on/off
+  Future<bool> isLocationAvailable() => throw UnimplementedError(
+      'isLocationAvailable() has not been implemented.');
+
+  /// initialSdk
+  Future<bool> initialSdk() =>
+      throw UnimplementedError('initialSdk() has not been implemented.');
 
   /// subscription scan [BluetoothBLEModel] device
   Stream<BluetoothBLEModel> deviceResult() =>

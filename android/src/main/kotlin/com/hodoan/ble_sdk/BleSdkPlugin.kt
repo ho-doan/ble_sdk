@@ -33,8 +33,9 @@ import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener
 
 /** BleSdkPlugin */
 class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, ActivityAware,
-    RequestPermissionsResultListener {
+        RequestPermissionsResultListener {
     private lateinit var channel: MethodChannel
+
     private lateinit var activity: Activity
     private lateinit var context: Context
     private lateinit var bleClient: BleClient
@@ -57,17 +58,18 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         context = binding.applicationContext
         channel = MethodChannel(binding.binaryMessenger, "ble_sdk")
         channel.setMethodCallHandler(this)
+        BleClient.listenLocation(context, this)
         initialSdk()
         EventChannel(binding.binaryMessenger, "ble_sdk_scan").setStreamHandler(scanEvent)
         EventChannel(binding.binaryMessenger, "ble_sdk_connect").setStreamHandler(stateConnectEvent)
         EventChannel(binding.binaryMessenger, "ble_sdk_bluetooth").setStreamHandler(
-            stateBluetoothEvent
+                stateBluetoothEvent
         )
         EventChannel(binding.binaryMessenger, "ble_sdk_logs").setStreamHandler(
-            logEvent
+                logEvent
         )
         EventChannel(binding.binaryMessenger, "ble_sdk_char").setStreamHandler(
-            characteristicEvent
+                characteristicEvent
         )
     }
 
@@ -76,10 +78,10 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        val check = initialSdk(result)
-        if (!check) return
         when (call.method) {
+            "initialSdk" -> initialSdk(result)
             "turnOnBluetooth" -> turnOnBluetooth(result)
+            "turnOnLocation" -> turnOnLocation(result)
             "requestPermission" -> requestPermission(result)
             "requestPermissionSettings" -> requestPermissionSettings(result)
             "checkPermission" -> checkPermission(result)
@@ -96,38 +98,47 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
             "checkBonded" -> checkBonded(result)
             "unBonded" -> unBonded(call, result)
             "isBluetoothAvailable" -> isBluetoothAvailable(result)
+            "isLocationAvailable" -> isLocationAvailable(result)
             else -> result.notImplemented()
         }
     }
 
     //#region onMethodCall
     private fun turnOnBluetooth(result: Result) {
-        val intentOpenBluetoothSettings = Intent()
-        intentOpenBluetoothSettings.action = Settings.ACTION_BLUETOOTH_SETTINGS
-        activity.startActivity(intentOpenBluetoothSettings)
+        enableBluetooth()
+        result.success(null)
+    }
+
+    private fun turnOnLocation(result: Result) {
+        enableLocation()
         result.success(null)
     }
 
     private fun initialSdk(result: Result? = null): Boolean {
         if (this::bleClient.isInitialized) return true
-        val manager = getManager(context)
-        val location = enableLocation()
-        if (!location) {
+//        val checkPer = checkPermissionConnect() && checkPermissionScan()
+//        if (this::activity.isInitialized && !checkPer) {
+//            requestPermission()
+//            return false
+//        }
+        if (!checkLocation()) {
+//            if (this::activity.isInitialized) {
+//                enableLocation()
+//            }
             result?.error("1", "Please enable location", null)
             return false
         }
-        if (manager?.adapter?.isEnabled == false) {
-            enableBluetooth()
+        val manager = getManager(context)
+        if (manager == null || manager.adapter == null || manager.adapter?.isEnabled == false) {
+//            if (this::activity.isInitialized) {
+//                enableBluetooth()
+//            }
             result?.error("2", "Please enable Bluetooth", null)
             return false
         }
-        manager?.let {
-            bleClient = BleClient(context, manager.adapter, this)
-            bleClient.listen(context)
-            return true
-        }
-        result?.error("3", "not init bleClient, please debug", null)
-        return false
+        bleClient = BleClient(context, manager.adapter, this)
+        bleClient.listen(context)
+        return true
     }
 
     private fun requestPermission(result: Result) {
@@ -187,8 +198,8 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     private fun writeCharacteristic(call: MethodCall, result: Result) {
         val charValue = CharacteristicValue.parseFrom(call.arguments as ByteArray)
         logEvent.success(
-            Log.newBuilder().setCharacteristic(charValue.characteristic)
-                .setMessage("data write " + charValue.dataList.joinToString(", ")).build()
+                Log.newBuilder().setCharacteristic(charValue.characteristic)
+                        .setMessage("data write " + charValue.dataList.joinToString(", ")).build()
         )
         characteristicChannel.createRequest(result)
         val isResult = bleClient.writeCharacteristic(charValue)
@@ -209,8 +220,8 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     private fun writeCharacteristicNoResponse(call: MethodCall, result: Result) {
         val charValue = CharacteristicValue.parseFrom(call.arguments as ByteArray)
         logEvent.success(
-            Log.newBuilder().setCharacteristic(charValue.characteristic)
-                .setMessage("data write " + charValue.dataList.joinToString(", ")).build()
+                Log.newBuilder().setCharacteristic(charValue.characteristic)
+                        .setMessage("data write " + charValue.dataList.joinToString(", ")).build()
         )
         val isResult = bleClient.writeCharacteristic(charValue)
         result.success(isResult)
@@ -230,9 +241,9 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         val charValue = Characteristic.parseFrom(call.arguments as ByteArray)
         val isResult = bleClient.notificationCharacteristic(charValue)
         logEvent.success(
-            Log.newBuilder().setCharacteristic(charValue)
-                .setMessage("notification ${charValue.characteristicId} status bool: $isResult")
-                .build()
+                Log.newBuilder().setCharacteristic(charValue)
+                        .setMessage("notification ${charValue.characteristicId} status bool: $isResult")
+                        .build()
         )
         result.success(isResult)
     }
@@ -247,9 +258,9 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
 //            )
 //        }
         logEvent.success(
-            Log.newBuilder().setCharacteristic(charValue)
-                .setMessage("indicator ${charValue.characteristicId} status bool: $isResult")
-                .build()
+                Log.newBuilder().setCharacteristic(charValue)
+                        .setMessage("indicator ${charValue.characteristicId} status bool: $isResult")
+                        .build()
         )
         result.success(isResult)
     }
@@ -270,9 +281,20 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     private fun isBluetoothAvailable(result: Result) {
         result.success(getManager(context)?.adapter?.isEnabled ?: false)
     }
+
+    private fun isLocationAvailable(result: Result) {
+        result.success(checkLocation())
+    }
     //#endregion
 
     //region init callback sdk
+    override fun locationListener(status: Boolean) {
+        android.util.Log.i(BleSdkPlugin::class.simpleName, "locationListener: Location Available = $status")
+//        if (status && !this::bleClient.isInitialized) {
+//            initialSdk()
+//        }
+    }
+
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
     }
@@ -280,8 +302,8 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     override fun checkPermissionConnect(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             return ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.BLUETOOTH_CONNECT
+                    context,
+                    Manifest.permission.BLUETOOTH_CONNECT
             ) == PackageManager.PERMISSION_GRANTED
         }
         return true
@@ -290,10 +312,10 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     override fun checkPermissionScan(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             context.checkSelfPermission(
-                Manifest.permission.ACCESS_FINE_LOCATION
+                    Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
                     && context.checkSelfPermission(
-                Manifest.permission.BLUETOOTH_SCAN
+                    Manifest.permission.BLUETOOTH_SCAN
             ) == PackageManager.PERMISSION_GRANTED
         } else {
             context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -303,39 +325,40 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     override fun requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             activity.requestPermissions(
-                arrayOf(
-                    Manifest.permission.BLUETOOTH_SCAN,
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ), 111
+                    arrayOf(
+                            Manifest.permission.BLUETOOTH_SCAN,
+                            Manifest.permission.BLUETOOTH_CONNECT,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    ), 111
             )
         } else {
             activity.requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                111
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    111
             )
         }
     }
 
-    override fun enableLocation(): Boolean {
-        val check = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+    private fun checkLocation(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val lm: LocationManager =
-                context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                    context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             lm.isLocationEnabled
         } else {
             @Suppress("DEPRECATION")
             val mode: Int = Settings.Secure.getInt(
-                context.contentResolver, Settings.Secure.LOCATION_MODE,
-                Settings.Secure.LOCATION_MODE_OFF
+                    context.contentResolver, Settings.Secure.LOCATION_MODE,
+                    Settings.Secure.LOCATION_MODE_OFF
             )
             mode != Settings.Secure.LOCATION_MODE_OFF
         }
+    }
+
+    override fun enableLocation(): Boolean {
+        val check = checkLocation()
         if (!check) {
-            if (!this::activity.isInitialized) {
-                return false
-            }
             val intent = Intent(
-                Settings.ACTION_LOCATION_SOURCE_SETTINGS
+                    Settings.ACTION_LOCATION_SOURCE_SETTINGS
             )
             activity.startActivity(intent)
         }
@@ -367,37 +390,37 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         val model = Services.newBuilder()
         model.addAllServices(services.map { service ->
             Service.newBuilder().setServiceId(service.uuid.toString())
-                .addAllCharacteristics(service.characteristics.map {
-                    Characteristic.newBuilder()
-                        .setCharacteristicId(it.uuid.toString())
-                        .setServiceId(service.uuid.toString())
-                        .setDeviceId(deviceId)
-                        .addAllProperties(DetectCharProperties.detect(it.properties))
-                        .build()
-                }).build()
+                    .addAllCharacteristics(service.characteristics.map {
+                        Characteristic.newBuilder()
+                                .setCharacteristicId(it.uuid.toString())
+                                .setServiceId(service.uuid.toString())
+                                .setDeviceId(deviceId)
+                                .addAllProperties(DetectCharProperties.detect(it.properties))
+                                .build()
+                    }).build()
         }.toList())
         discoveredServicesChannel.closeRequest(model.build())
     }
 
     override fun onCharacteristicValue(
-        characteristic: BluetoothGattCharacteristic,
-        value: ByteArray
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray
     ) {
         val model = CharacteristicValue.newBuilder()
         val valueListInt = value.toList().map { it.toInt().and(255) }
         model.characteristic =
-            Characteristic.newBuilder().setCharacteristicId(characteristic.uuid.toString())
-                .addAllProperties(DetectCharProperties.detect(characteristic.properties))
-                .build()
+                Characteristic.newBuilder().setCharacteristicId(characteristic.uuid.toString())
+                        .addAllProperties(DetectCharProperties.detect(characteristic.properties))
+                        .build()
         model.addAllData(valueListInt)
         characteristicEvent.success(model.build())
         characteristicChannel.closeRequest(model.build())
         logEvent.success(
-            Log.newBuilder().setCharacteristic(
-                Characteristic.newBuilder().setServiceId(characteristic.service.uuid.toString())
-                    .setCharacteristicId(characteristic.uuid.toString())
-                    .addAllProperties(DetectCharProperties.detect(characteristic.properties))
-            ).setMessage(valueListInt.joinToString(", ")).build()
+                Log.newBuilder().setCharacteristic(
+                        Characteristic.newBuilder().setServiceId(characteristic.service.uuid.toString())
+                                .setCharacteristicId(characteristic.uuid.toString())
+                                .addAllProperties(DetectCharProperties.detect(characteristic.properties))
+                ).setMessage(valueListInt.joinToString(", ")).build()
         )
     }
 
@@ -414,7 +437,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
         binding.addRequestPermissionsResultListener(this)
-        requestPermission()
+//        initialSdk()
     }
 
     override fun onDetachedFromActivityForConfigChanges() {}
@@ -426,12 +449,12 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
     ): Boolean {
         val result = requestCode == 111 && !grantResults.toList()
-            .any { it != PackageManager.PERMISSION_GRANTED }
+                .any { it != PackageManager.PERMISSION_GRANTED }
         permissionChannel.closeRequest(result)
         return result
     }

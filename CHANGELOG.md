@@ -1,4 +1,16 @@
-# 0.2.1 10-01-2023
+## 0.2.3 10-02-2023
+
+- new fun turnOnLocation (Support ios)
+- new fun isLocationAvailable (Support ios)
+- new fun initialSdk (Support ios)
+
+## 0.2.2 10-02-2023
+
+- new fun turnOnLocation (Support android)
+- new fun isLocationAvailable (Support android)
+- new fun initialSdk (Support android)
+
+## 0.2.1 10-01-2023
 
 - fix not isInitialized bleSdk(android)
 

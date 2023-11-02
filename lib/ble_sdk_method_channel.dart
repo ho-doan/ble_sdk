@@ -99,6 +99,16 @@ class MethodChannelBleSdk extends BleSdkPlatform {
       .then((value) => value ?? false);
 
   @override
+  Future<bool> isLocationAvailable() => methodChannel
+      .invokeMethod<bool>('isLocationAvailable')
+      .then((value) => value ?? false);
+
+  @override
+  Future<bool> initialSdk() => methodChannel
+      .invokeMethod<bool>('initialSdk')
+      .then((value) => value ?? false);
+
+  @override
   Future<PermissionResult> checkPermission() => methodChannel
       .invokeMethod<int>('checkPermission')
       .then((value) => value != null
@@ -117,6 +127,10 @@ class MethodChannelBleSdk extends BleSdkPlatform {
   @override
   Future<void> turnOnBluetooth() =>
       methodChannel.invokeMethod<void>('turnOnBluetooth');
+
+  @override
+  Future<void> turnOnLocation() =>
+      methodChannel.invokeMethod<void>('turnOnLocation');
 
   @override
   Stream<BluetoothBLEModel> deviceResult() => deviceChannel

@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreBluetooth
+import CoreLocation
 
 protocol BleClientDelegate: NSObjectProtocol{
     func bonded(_ bonded: Bool)
@@ -163,6 +164,10 @@ class BleClient : NSObject{
     
     func isBluetoothAvailable()->Bool{
         return manager.state == .poweredOn
+    }
+    
+    func isLocationAvailable()->Bool{
+        return CLLocationManager.locationServicesEnabled()
     }
 }
 

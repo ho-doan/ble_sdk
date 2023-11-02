@@ -90,6 +90,20 @@ abstract class BleSdkNative {
   /// turn on bluetooth
   Future<void> turnOnBluetooth() => BleSdkPlatform.instance.turnOnBluetooth();
 
+  /// turn on location
+  Future<void> turnOnLocation() => BleSdkPlatform.instance.turnOnLocation();
+
+  /// check location on/off
+  Future<bool> isLocationAvailable() =>
+      BleSdkPlatform.instance.isLocationAvailable();
+
+  /// initialSdk
+  /// init when:
+  ///   permission granted
+  ///   location enable
+  ///   bluetooth enable
+  Future<bool> initialSdk() => BleSdkPlatform.instance.initialSdk();
+
   /// open settings detail app
   Future<void> requestPermissionSettings() =>
       BleSdkPlatform.instance.requestPermissionSettings();
