@@ -1,3 +1,6 @@
+## 0.2.5-beta 23-01-2024
+
+- fix initial plugin func android
 ## 0.2.4 23-01-2024
 
 - fix initial plugin func android

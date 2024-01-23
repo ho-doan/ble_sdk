@@ -115,7 +115,11 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
     }
 
     private fun initialSdk(result: Result? = null): Boolean {
-        if (this::bleClient.isInitialized) return true
+        if (this::bleClient.isInitialized) {
+            android.util.Log.i(BleSdkPlugin::class.simpleName, "bleClient isInitialized")
+            result?.success(true)
+            return true
+        }
 //        val checkPer = checkPermissionConnect() && checkPermissionScan()
 //        if (this::activity.isInitialized && !checkPer) {
 //            requestPermission()
@@ -138,6 +142,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         }
         bleClient = BleClient(context, manager.adapter, this)
         bleClient.listen(context)
+        android.util.Log.i(BleSdkPlugin::class.simpleName, "initial success")
         result?.success(true)
         return true
     }
