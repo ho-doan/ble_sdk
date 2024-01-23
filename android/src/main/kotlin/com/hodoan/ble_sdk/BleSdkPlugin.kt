@@ -138,6 +138,7 @@ class BleSdkPlugin : FlutterPlugin, MethodCallHandler, IBleClientCallBack, Activ
         }
         bleClient = BleClient(context, manager.adapter, this)
         bleClient.listen(context)
+        result?.success(true)
         return true
     }
 
